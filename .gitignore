@@ -1,0 +1,9 @@
+bin/
+build/
+*.out
+*.exe
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*~
