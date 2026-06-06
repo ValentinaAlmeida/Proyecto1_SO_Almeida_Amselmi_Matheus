@@ -4,7 +4,9 @@
 
  typedef struct {
     int hay_tuberia; //despues de ese comando hay tubería o no, para control
-    int modo; //valores 1,2,3, 1 si hay un ; . 2 si hay && y 3 si hay 
+    int modo; //valores 1,2,3 1 si hay un ; . 2 si hay && , 3 si hay ;
+    char* r_entrada;
+    char* r_salida;
     char* instruccion; //arreglo con la instrucción base
     char** argumentos; //arreglo de cadenas de caracteres para cada argumento que tenga ese comando
     int cant_argumentos; //solamente por facilidad de guardar el número
