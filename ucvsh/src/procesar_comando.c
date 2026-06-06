@@ -24,7 +24,7 @@
     char* palabra= strtok(linea_picada, " \n\t");//corta hasta que veas el primer espacio, salto de linea o tabulador
     //veo si la primera es exit, si lo es no tiene sentido guardarla, simpemente salgo de una
     if(strcmp(palabra,"exit")== 0){
-        //finalizar_ejecucion(); //esa funcion en algun momento estara
+        //finalizar_ejecucion(); //esa funcion en algun momento estara aqui
     }else if(strcmp(palabra,"|")== 0 || strcmp(palabra,"&&")== 0||strcmp(palabra,";")== 0 ||strcmp(palabra,"<")== 0 ||strcmp(palabra,">")== 0){
         //error porque no puede empezar con pipe, and, or o ; ni las redirecciones
         printf("error\n");
