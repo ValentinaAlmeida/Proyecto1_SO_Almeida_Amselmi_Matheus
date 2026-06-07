@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -g
-SRC = src/main.c src/ejecutar.c src/path.c src/pipes.c src/redireccion.c src/procesar_comando.c
+SRC = src/main.c src/ejecutar.c src/path.c src/pipes.c src/redireccion.c src/procesar_comando.c src/historial_comandos.c
 OBJ = $(SRC:src/%.c=build/%.o)
 BIN = bin/ucvsh
 

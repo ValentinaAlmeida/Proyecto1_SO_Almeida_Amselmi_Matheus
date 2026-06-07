@@ -2,18 +2,29 @@
  #include <stdio.h>
  #include <string.h>
  #include <stdlib.h>
-#include "../include/ejecutar.h"
+ #include "../include/ejecutar.h"
  #include "../include/estructura_comando.h"
-#include "../include/ejecutar.h"
+ #include "../include/ejecutar.h"
+ #include "../include/historial_comandos.h"
 
  extern void error_o_liberar(Comando* comando, int numero);
  extern Comando* procesar_c(char *linea_picada, int *numero);
 
  int main(){
+    char* ruta_home= getenv("HOME");
+    char ruta_historial[1024];//por el tamaño de linea
+    if(ruta_home != NULL){
+        strcpy(ruta_historial, ruta_home);//copio la parte de la ruta donde este
+        strcat(ruta_historial, "/.historial_ucvshell");//concateno el nombre del archivo privilegiado del historial
+    }else{
+        strcpy(ruta_historial, ".historial_ucvshell");//en todo caso de que no encuentre nada, por no dejar
+    }
+
+    carga_inicial(ruta_historial);
 
     char* linea_original=NULL;
     char* linea_copia=NULL;
-    char* impresion="UCVShell";
+    char* impresion="ucvsh";
 
     size_t tamano=0;
     //aqui va el while true pero no lo voy a poner hasta que vea que funciona todo :) attm ale
@@ -27,6 +38,10 @@
 
         int numero=0;
         linea_original=strdup(linea_copia);
+        linea_original[strcspn(linea_original, "\n")]='\0';
+
+        editar_historial(linea_original, ruta_historial);
+
         //aqui debo poner la funcion de guardar en el historial la linea original
         Comando* comando= procesar_c(linea_copia, &numero);
 
