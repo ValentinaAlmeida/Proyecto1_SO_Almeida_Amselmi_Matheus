@@ -173,6 +173,13 @@
                 comando[i].orden = 2;
             }
         }else{ //simplemente es algun argumento que hace algo
+            //strpbrk verifica si alguno es de los caracteres especiales de operaciones, recorre todo y lo busca si lo consigue retorna la posicion
+            if (strpbrk(palabra, "&|;><") != NULL) {// para contemplar el caso que se le ocurrio a una de mis compañeras de tener un &&&
+                printf("Error ha escrito mal su comando, no puede tener operadores seguidos como pasa en: '%s'\n", palabra);
+                error_o_liberar(comando, i + 1);
+                *numero = 0;
+                return NULL;
+            }
             comando[i].argumentos[num_arg]=strdup(palabra);
             num_arg++;
             comando[i].cant_argumentos=num_arg;
