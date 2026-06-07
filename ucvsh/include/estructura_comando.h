@@ -5,7 +5,7 @@
 
  typedef struct {
     int hay_tuberia; //despues de ese comando hay tubería o no, para control
-    int modo; //valores 1,2,3 1 si hay un ; . 2 si hay && , 3 si hay ;
+    int modo; //valores 1,2,3 1 si hay un or . 2 si hay && , 3 si hay ;
     char* r_entrada;
     char* r_salida;
     int orden;//1 si entrada, 2 si salida
