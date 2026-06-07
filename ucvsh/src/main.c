@@ -3,6 +3,7 @@
  #include <string.h>
  #include <stdlib.h>
  #include "../include/estructura_comando.h"
+#include "../include/ejecutar.h"
 
  extern void error_o_liberar(Comando* comando, int numero);
  extern Comando* procesar_c(char *linea_picada, int *numero);
@@ -29,7 +30,7 @@
         Comando* comando= procesar_c(linea_copia, &numero);
 
         if(comando!= NULL){// si es null hubo fallo y debe volver a empezar luego de escribir el error
-        //Aqui pueden escribir el inicio del proceso crear los hijos y tal dependiendo de lo que esta en num comandos
+        ejecutar_comando(comando, numero);
 
         error_o_liberar(comando, numero);
 
