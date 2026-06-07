@@ -1,8 +1,8 @@
-include <stdlib.h>
-include <string.h>
-include <unistd.h>
-include <stdio.h>
-include "../include/path.h"
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <stdio.h>
+#include "../include/path.h"
 
 char *buscar_en_path(char *instruccion){
     char *path_env = getenv("PATH");
@@ -21,7 +21,8 @@ char *buscar_en_path(char *instruccion){
     while(path_tokenizado != NULL){
         char ruta_completa[1024];
         snprintf(ruta_completa, sizeof(ruta_completa), "%s/%s", path_tokenizado, instruccion);
-        
+
+
         if(access(ruta_completa, X_OK)==0){
             free(path_copia);
             return strdup(ruta_completa);
