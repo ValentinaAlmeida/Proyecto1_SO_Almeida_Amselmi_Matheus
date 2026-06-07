@@ -1,4 +1,5 @@
- //# {} [] > < || &&
+ //#{}[] > < || &&
+
  #ifndef ESTRUCTURA_COMANDO_H
  #define ESTRUCTURA_COMANDO_H
 
@@ -7,11 +8,12 @@
     int modo; //valores 1,2,3 1 si hay un ; . 2 si hay && , 3 si hay ;
     char* r_entrada;
     char* r_salida;
+    int orden;//1 si entrada, 2 si salida
     char* instruccion; //arreglo con la instrucción base
     char** argumentos; //arreglo de cadenas de caracteres para cada argumento que tenga ese comando
     int cant_argumentos; //solamente por facilidad de guardar el número
  }Comando;
 
- Comando* procesar_c(char *linea_picada, int* num_comandos); //como voy a llenarlo
+ Comando* procesar_c(char *linea_picada, int* numero); //como voy a llenarlo
 
  #endif
