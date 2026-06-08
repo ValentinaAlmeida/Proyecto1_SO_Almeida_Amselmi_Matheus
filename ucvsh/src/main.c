@@ -23,6 +23,7 @@
     carga_inicial(ruta_historial);
 
     char* linea_original=NULL;
+    char linea_intermedia[1024];
     char* linea_copia=NULL;
     char* impresion="ucvsh";
 
@@ -34,23 +35,27 @@
     fflush(stdout);
     //aqui va lo de los ctrl
 
-    if(getline(&linea_copia, &tamano,stdin)!=-1){
+    if (leer_actual(linea_intermedia, sizeof(linea_intermedia)) != -1) {
+            
+        if (strlen(linea_intermedia) > 0) {
 
-        int numero=0;
-        linea_original=strdup(linea_copia);
-        linea_original[strcspn(linea_original, "\n")]='\0';
+            int numero=0;
+            linea_copia=strdup(linea_intermedia);
+            linea_original=strdup(linea_copia);
+            linea_original[strcspn(linea_original, "\n")]='\0';
 
-        editar_historial(linea_original, ruta_historial);
+            editar_historial(linea_original, ruta_historial);
 
-        //aqui debo poner la funcion de guardar en el historial la linea original
-        Comando* comando= procesar_c(linea_copia, &numero);
+            //aqui debo poner la funcion de guardar en el historial la linea original
+            Comando* comando= procesar_c(linea_copia, &numero);
 
-        if(comando!= NULL){// si es null hubo fallo y debe volver a empezar luego de escribir el error
-        ejecutar_comando(comando, numero);
+            if(comando!= NULL){// si es null hubo fallo y debe volver a empezar luego de escribir el error
+            ejecutar_comando(comando, numero);
 
-        error_o_liberar(comando, numero);
+            error_o_liberar(comando, numero);
 
-        }
+            }
+        }   
     free(linea_original);
     free(linea_copia);
     linea_copia = NULL;  // Puntero a NULL vital para el próximo getline

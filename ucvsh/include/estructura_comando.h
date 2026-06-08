@@ -12,6 +12,7 @@
     char* instruccion; //arreglo con la instrucción base
     char** argumentos; //arreglo de cadenas de caracteres para cada argumento que tenga ese comando
     int cant_argumentos; //solamente por facilidad de guardar el número
+    int bandera_2plano;
  }Comando;
 
  Comando* procesar_c(char *linea_picada, int* numero); //como voy a llenarlo
