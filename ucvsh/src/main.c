@@ -77,8 +77,11 @@ int main(){
                 error_o_liberar(comando, numero); // Limpiamos el comando antes de salir
                 builtin_exit(lista_jobs);         // Esta función ya tiene el exit(0) adentro
             }
-            else {
-                // Si no fue ninguno de mis builtins, es un comando externo
+        else {
+                if (comando->bandera_2plano == 0) {
+                    strcpy(comando_primer_plano, comando[0].instruccion);
+                }
+
                 ejecutar_comando(comando, numero);
                 error_o_liberar(comando, numero);
             }
