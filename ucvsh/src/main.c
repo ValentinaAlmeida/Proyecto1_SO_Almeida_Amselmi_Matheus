@@ -1,47 +1,69 @@
- //# {} [] > < || &&
- #include <stdio.h>
- #include <string.h>
- #include <stdlib.h>
+//# {} [] > < || &&
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include "../include/ejecutar.h"
- #include "../include/estructura_comando.h"
+#include "../include/estructura_comando.h"
 #include "../include/ejecutar.h"
+#include "../include/builtins.h"
+#include "../include/job_list.h"
 
- extern void error_o_liberar(Comando* comando, int numero);
- extern Comando* procesar_c(char *linea_picada, int *numero);
+extern void error_o_liberar(Comando* comando, int numero);
+extern Comando* procesar_c(char *linea_picada, int *numero);
 
- int main(){
+int main(){
 
     char* linea_original=NULL;
     char* linea_copia=NULL;
     char* impresion="UCVShell";
 
     size_t tamano=0;
+    //crea la estructura de los jobs por cada proceso hecho por Corina att val
+    Job* lista_jobs = NULL;
     //aqui va el while true pero no lo voy a poner hasta que vea que funciona todo :) attm ale
 
     printf("%s", impresion);
     printf("%s",">");
     fflush(stdout);
-    //aqui va lo de los ctrl
+    //aqui va lo de los ctrl, es el ulitmo modulo de valentina
 
     if(getline(&linea_copia, &tamano,stdin)!=-1){
 
-        int numero=0;
+        int numero=0;  
         linea_original=strdup(linea_copia);
         //aqui debo poner la funcion de guardar en el historial la linea original
         Comando* comando= procesar_c(linea_copia, &numero);
+        
+        //segun el comando reviso si es un builtin
+        if(comando != NULL){ // si es null hubo fallo
+            char* cmd_nombre = comando->instruccion;
 
-        if(comando!= NULL){// si es null hubo fallo y debe volver a empezar luego de escribir el error
-        ejecutar_comando(comando, numero);
+            if (strcmp(cmd_nombre, "jobs") == 0) {
+                builtin_jobs(lista_jobs);
+                error_o_liberar(comando, numero);
+            }
+            else if (strcmp(cmd_nombre, "fg") == 0) {
+                int id_trabajo = (comando->cant_argumentos > 0) ? atoi(comando->argumentos[0]) : 1;
 
-        error_o_liberar(comando, numero);
-
+                builtin_fg(&lista_jobs, id_trabajo);
+                error_o_liberar(comando, numero);
+            }
+            else if (strcmp(cmd_nombre, "exit") == 0) {
+                error_o_liberar(comando, numero); // Limpiamos el comando antes de salir
+                builtin_exit(lista_jobs);         // Esta función ya tiene el exit(0) adentro
+            }
+            else {
+                // Si no fue ninguno de mis builtins, es un comando externo
+                ejecutar_comando(comando, numero);
+                error_o_liberar(comando, numero);
+            }
         }
-    free(linea_original);
-    free(linea_copia);
-    linea_copia = NULL;  // Puntero a NULL vital para el próximo getline
-    tamano = 0;
+        
+        free(linea_original);
+        free(linea_copia);
+        linea_copia = NULL;  // Puntero a NULL vital para el próximo getline
+        tamano = 0;
+    } // Aquí cierra 
 
-    //aqui cierra
     return 0;
- }
 }
