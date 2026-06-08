@@ -2,7 +2,11 @@
 #define JOB_LIST_H
 #include <sys/types.h> //para los tipos de datos de procesos e ids
 #include <stdbool.h>//para la verificacion 
-//estructura base simple de el proceso que alexandra usara
+//los estados ahora si estan defindos, oos pondre como macros 
+// ESTADO_EJECUTANDO 1
+// ESTADO_DETENIDO   2
+// ESTADO_TERMINADO  3
+//estructura base simple de el proceso que alexandra y Corina usara
  typedef struct Proceso
 {
 pid_t pid;
