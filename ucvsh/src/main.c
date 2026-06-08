@@ -10,7 +10,8 @@
 #include "../include/historial_comandos.h"
 #include "../include/signals.h"
 //# {} [] > < || &&
-
+//crea la estructura de los jobs por cada proceso hecho por Corina att val
+    Job* lista_jobs = NULL;
 extern void error_o_liberar(Comando* comando, int numero);
 extern Comando* procesar_c(char *linea_picada, int *numero);
 //variables que debo usar para capturar que comando se esta pasando a segundo plano att val
@@ -30,12 +31,11 @@ int main(){
     carga_inicial(ruta_historial);
 
     char* linea_original=NULL;
+    char linea_intermedia[1024];
     char* linea_copia=NULL;
     char* impresion="ucvsh";
 
     size_t tamano=0;
-    //crea la estructura de los jobs por cada proceso hecho por Corina att val
-    Job* lista_jobs = NULL;
     //aqui va el while true pero no lo voy a poner hasta que vea que funciona todo :) attm ale
 
     printf("%s", impresion);
@@ -44,16 +44,20 @@ int main(){
     //aqui va lo de los ctrl, es el ulitmo modulo de valentina
     //ya hice el modulo, manejamos Ctrl+C, Ctrl+Z
     Manejadores_senales();
-    if(getline(&linea_copia, &tamano,stdin)!=-1){
 
-        int numero=0;
-        linea_original=strdup(linea_copia);
-        linea_original[strcspn(linea_original, "\n")]='\0';
+    if (leer_actual(linea_intermedia, sizeof(linea_intermedia)) != -1) {
+            
+        if (strlen(linea_intermedia) > 0) {
+    
+            int numero=0;
+            linea_copia=strdup(linea_intermedia);
+            linea_original=strdup(linea_copia);
+            linea_original[strcspn(linea_original, "\n")]='\0';
 
-        editar_historial(linea_original, ruta_historial);
+            editar_historial(linea_original, ruta_historial);
 
-        //aqui debo poner la funcion de guardar en el historial la linea original
-        Comando* comando= procesar_c(linea_copia, &numero);
+            //aqui debo poner la funcion de guardar en el historial la linea original
+            Comando* comando= procesar_c(linea_copia, &numero);
 
         //segun el comando reviso si es un builtin
         if(comando != NULL){ // si es null hubo fallo
@@ -87,4 +91,5 @@ int main(){
     } // Aquí cierra
 
     return 0;
+}
 }
