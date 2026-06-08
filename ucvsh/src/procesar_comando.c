@@ -34,6 +34,18 @@
     char *linea_copia = strdup(linea_picada);
     int cant_c = 0;
     
+    int k=0;
+    int hay_comilla=0;
+    while(linea_copia[k]!='\0'){
+        if((linea_copia[k]=='\'') || (linea_copia[k]=='\"')){
+            hay_comilla=1;
+        }
+        if(hay_comilla==1 && ((linea_copia[k]=='\t') || (linea_copia[k]==' ')|| (linea_copia[k]=='  '))){
+            linea_copia[k]=='\x04';// le meto un caracter no imprimible cualquiera y que no se pone en carpetas o archivo, así me aseguro que el problema de espacios no sea problema
+        }
+
+    }
+
     char* verificar = strtok(linea_copia, " \n\t");
     while(verificar != NULL) {
         
@@ -77,8 +89,6 @@
     comando[0].bandera_2plano = 0;
 
     int cambio=0;
-
-    
 
     while(palabra != NULL){
         palabra= strtok(NULL, " \n\t");
@@ -206,6 +216,13 @@
                     //si existe el segundo &, si es así muere como error de sintaxis, Pero como no es error de una prendo la bandera
                     comando[i].bandera_2plano = 1;
                     palabra[anterior_final] = '\0'; //como está pegado el argumento, para evitar problemas le quito el & y dejo el argumento tranquilito
+                    int l=0;
+                    while(linea_copia[l]!='\0'){
+                        if(linea_copia[l]=='\x04'){//revierto el cambio por si las dudas
+                        linea_copia[l]==' ';
+                        }
+            
+                    }
                     comando[i].argumentos[num_arg] = strdup(palabra);
                     num_arg++;
                     comando[i].cant_argumentos = num_arg;
@@ -256,6 +273,14 @@
                     return NULL;
                 }
             }
+            int l=0;
+            while(linea_copia[l]!='\0'){//revierto cambios antes de guardar finalmente todo
+                if(linea_copia[l]=='\x04'){
+                    linea_copia[l]==' ';
+                }
+            
+            }
+
             comando[i].argumentos[num_arg] = strdup(palabra);
             num_arg++;
             comando[i].cant_argumentos = num_arg;
