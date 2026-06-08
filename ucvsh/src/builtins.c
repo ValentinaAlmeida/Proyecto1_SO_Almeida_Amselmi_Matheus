@@ -56,7 +56,7 @@ void builtin_exit(Job* cabeza) {
     
     printf("Cerrando ucvsh... ¡Hasta luego!\n");
 
-    // Matamos los procesos uno a uno para que se queden por alli  
+    // Matamos los procesos uno a uno para que no se queden por alli  
     while (actual != NULL) {
         kill(actual->pgid, SIGKILL);
         actual = actual->next;
@@ -67,4 +67,24 @@ void builtin_exit(Job* cabeza) {
 
     //salimos de el interprete.
     exit(0);
+}
+void builtin_bg(Job ** lista_jobs,Comando * comando){
+pid_t pid= fork();
+if(pid<0){
+perror("Hubo en fallo para el proceso en segundo plano, intente otra vez");
+return;
+}else if(pid==0){
+if (execvp(comando->instruccion, comando->argumentos) == -1) {
+            perror("Error al ejecutar el comando en segundo plano");
+            exit(1); 
+        }
+}else{
+Insertar_job(lista_jobs, pid, comando->instruccion,0);
+Job * trabajo=Buscar_job_porpid(pid,lista_jobs);
+int id=trabajo->idInterno;
+printf("[%d] %d\n", id, pid);
+
+
+}
+
 }
