@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 //# {} [] > < || &&
 #include <stdio.h>
 #include <string.h>
@@ -8,19 +7,21 @@
 #include "../include/ejecutar.h"
 #include "../include/builtins.h"
 #include "../include/job_list.h"
- #include "../include/historial_comandos.h"
- //# {} [] > < || &&
+#include "../include/historial_comandos.h"
+//# {} [] > < || &&
+
 extern void error_o_liberar(Comando* comando, int numero);
 extern Comando* procesar_c(char *linea_picada, int *numero);
 
- int main(){
- char* ruta_home= getenv("HOME");
-    char ruta_historial[1024];//por el tamaño de linea
+int main(){
+    char* ruta_home= getenv("HOME");
+    char ruta_historial[1024]; //por el tamaño de linea
+    
     if(ruta_home != NULL){
-        strcpy(ruta_historial, ruta_home);//copio la parte de la ruta donde este
-        strcat(ruta_historial, "/.historial_ucvshell");//concateno el nombre del archivo privilegiado del historial
+        strcpy(ruta_historial, ruta_home); //copio la parte de la ruta donde este
+        strcat(ruta_historial, "/.historial_ucvshell"); //concateno el nombre del archivo privilegiado del historial
     }else{
-        strcpy(ruta_historial, ".historial_ucvshell");//en todo caso de que no encuentre nada, por no dejar
+        strcpy(ruta_historial, ".historial_ucvshell"); //en todo caso de que no encuentre nada, por no dejar
     }
 
     carga_inicial(ruta_historial);
@@ -41,7 +42,7 @@ extern Comando* procesar_c(char *linea_picada, int *numero);
 
     if(getline(&linea_copia, &tamano,stdin)!=-1){
 
-        int numero=0;  
+        int numero=0;
         linea_original=strdup(linea_copia);
         linea_original[strcspn(linea_original, "\n")]='\0';
 
@@ -49,7 +50,7 @@ extern Comando* procesar_c(char *linea_picada, int *numero);
 
         //aqui debo poner la funcion de guardar en el historial la linea original
         Comando* comando= procesar_c(linea_copia, &numero);
-        
+
         //segun el comando reviso si es un builtin
         if(comando != NULL){ // si es null hubo fallo
             char* cmd_nombre = comando->instruccion;
@@ -74,12 +75,12 @@ extern Comando* procesar_c(char *linea_picada, int *numero);
                 error_o_liberar(comando, numero);
             }
         }
-        
+
         free(linea_original);
         free(linea_copia);
         linea_copia = NULL;  // Puntero a NULL vital para el próximo getline
         tamano = 0;
-    } // Aquí cierra 
+    } // Aquí cierra
 
     return 0;
 }
