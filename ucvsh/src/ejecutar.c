@@ -6,12 +6,30 @@
 #include "../include/ejecutar.h"
 #include "../include/estructura_comando.h"
 #include "../include/path.h"
+#include "../include/redireccion.h"
+#include "../include/pipes.h"
 
 
 int es_builtin(char *instruccion){
     return strcmp(instruccion, "cd") == 0 ||
             strcmp(instruccion, "exit") == 0 ||
             strcmp(instruccion, "jobs") == 0;
+}
+
+void ejecutar_en_hijo(Comando *cmd){
+    char *ruta = buscar_en_path(cmd->instruccion);
+    if(ruta == NULL){
+        exit(1);
+    }
+    char **args = malloc(sizeof(char*) * (cmd->cant_argumentos + 2));
+    args[0] = cmd->instruccion;
+    for(int i = 0; i < cmd->cant_argumentos; i++){
+        args[i+1] = cmd->argumentos[i];
+    }
+    args[cmd->cant_argumentos + 1] = NULL;
+    execv(ruta, args);
+    perror("Error al ejecutar el comando");
+    exit(1);
 }
 
 int ejecutar_uno(Comando *cmd){
@@ -37,6 +55,28 @@ int ejecutar_uno(Comando *cmd){
     }
     if(pid==0){
         // Proceso hijo
+            //redirecciones?
+            if(cmd->r_entrada != NULL && cmd->r_salida != NULL){
+                if(cmd->orden == 1){
+                    if(redirigir_entrada(cmd->r_entrada) == -1 || redirigir_salida(cmd->r_salida) == -1){
+                        exit(1);
+                    }
+                }else if(cmd->orden == 2){
+                    if(redirigir_salida(cmd->r_salida) == -1 || redirigir_entrada(cmd->r_entrada) == -1){
+                        exit(1);
+                    }
+                }   
+            
+            }else if(cmd->r_entrada != NULL){
+                if(redirigir_entrada(cmd->r_entrada) == -1){
+                    exit(1);
+                }
+            }else if(cmd->r_salida != NULL){
+                if(redirigir_salida(cmd->r_salida) == -1){
+                    exit(1);
+                }
+            }
+        
         execv(ruta, args);
         perror("Error al ejecutar el comando");
         
@@ -49,26 +89,41 @@ int ejecutar_uno(Comando *cmd){
     return WEXITSTATUS(status);
 }
 
-void ejecutar_comando(Comando *comados, int numero){
+void ejecutar_comando(Comando *comandos, int numero){
     int i=0;
     while(i<numero){
-        if(es_builtin(comados[i].instruccion)) {
-            printf("Lo sentimos, el comando %s no está implementado por que es un builtin\n", comados[i].instruccion);
+        if(es_builtin(comandos[i].instruccion)) {
+            printf("Lo sentimos, el comando %s no está implementado por que es un builtin\n", comandos[i].instruccion);
             i++;
         }else{
-            int codigo_salida=ejecutar_uno(&comados[i]);
-            if(comados[i].modo==1){
-                if(codigo_salida==0){
-                    break;
+            if(comandos[i].hay_tuberia==1){
+                int codigo_salida=ejecutar_pipe(&comandos[i], &comandos[i+1]);
+                if(comandos[i+1].modo==1){
+                    if(codigo_salida==0){
+                        break;
+                    }
+                }else if(comandos[i+1].modo==2){
+                    if(codigo_salida!=0){
+                        break;
+                    }
                 }
-            }else if(comados[i].modo==2){
-                if(codigo_salida!=0){
-                    break;
+                
+                i=i+2;
+            }else{
+                
+                int codigo_salida=ejecutar_uno(&comandos[i]);
+                if(comandos[i].modo==1){
+                    if(codigo_salida==0){
+                        break;
+                    }
+                }else if(comandos[i].modo==2){
+                    if(codigo_salida!=0){
+                        break;
+                    }
                 }
+            
+                i++;
             }
-        
-        i++;
         }
-    
     }
 }
