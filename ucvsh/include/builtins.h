@@ -1,6 +1,7 @@
 #ifndef BUILTINS_H
 #define BUILTINS_H
 #include "job_list.h"
+#include "estructura_comando.h"
 //funcion que maneja los jobs en segundo plano, para el comando jobs
 void builtin_jobs(Job* cabeza);
 //funcion para el comando fg pasar de segundo a primer plano

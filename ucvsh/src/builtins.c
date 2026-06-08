@@ -15,11 +15,11 @@ if (resultado > 0) {
             
             if (WIFEXITED(estado_kernel) || WIFSIGNALED(estado_kernel)) {
           
-                actual->estado = 2; // lo terminaron
+                actual->estado = 3; // lo terminaron
             } 
             else if (WIFSTOPPED(estado_kernel)) {
                 
-                actual->estado = 1; // luego veo que nuemro uso para detenido
+                actual->estado = 2; // luego veo que nuemro uso para detenido
             }
         }
 actual=actual->next;//avanzoa el siguiente
@@ -36,7 +36,7 @@ return;
 }
 printf("trayendo a primer plano :%s",actual->comando);
 kill(actual->pgid, SIGCONT);//esperar a el hijo y decirle que continue
-actual->estado = 3;//modificamos el estado leugo defino el numero para los que corren en segundo plano
+actual->estado = 1;//modificamos el estado leugo defino el numero para los que corren en segundo plano
 int estado_kernel;
 pid_t resultado = waitpid(actual->pgid, &estado_kernel, WUNTRACED);//recolecto a quin mande a segundo plano 
 if(resultado>0){ 
@@ -80,7 +80,7 @@ if (execvp(comando->instruccion, comando->argumentos) == -1) {
         }
 }else{
 Insertar_job(lista_jobs, pid, comando->instruccion,0);
-Job * trabajo=Buscar_job_porpid(pid,lista_jobs);
+Job * trabajo=Buscar_job_porpid(pid,*lista_jobs);
 int id=trabajo->idInterno;
 printf("[%d] %d\n", id, pid);
 

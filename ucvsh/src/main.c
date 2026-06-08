@@ -8,11 +8,14 @@
 #include "../include/builtins.h"
 #include "../include/job_list.h"
 #include "../include/historial_comandos.h"
+#include "../include/signals.h"
 //# {} [] > < || &&
 
 extern void error_o_liberar(Comando* comando, int numero);
 extern Comando* procesar_c(char *linea_picada, int *numero);
-
+//variables que debo usar para capturar que comando se esta pasando a segundo plano att val
+extern volatile pid_t pid_primer_plano;
+extern char comando_primer_plano[1024];
 int main(){
     char* ruta_home= getenv("HOME");
     char ruta_historial[1024]; //por el tamaño de linea
@@ -39,7 +42,8 @@ int main(){
     printf("%s",">");
     fflush(stdout);
     //aqui va lo de los ctrl, es el ulitmo modulo de valentina
-
+    //ya hice el modulo, manejamos Ctrl+C, Ctrl+Z
+    Manejadores_senales();
     if(getline(&linea_copia, &tamano,stdin)!=-1){
 
         int numero=0;
