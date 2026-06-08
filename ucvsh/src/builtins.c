@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <signal.h>
-
+extern volatile pid_t pid_primer_plano;
 void builtin_jobs(Job* cabeza){
 int estado_kernel;
 Job * actual=cabeza;
@@ -35,6 +35,7 @@ printf("Trabajo no encontrado, intente otra vez \n");
 return;
 }
 printf("trayendo a primer plano :%s",actual->comando);
+pid_primer_plano = actual->pgid;
 kill(actual->pgid, SIGCONT);//esperar a el hijo y decirle que continue
 actual->estado = 1;//modificamos el estado leugo defino el numero para los que corren en segundo plano
 int estado_kernel;
@@ -50,6 +51,7 @@ if (WIFEXITED(estado_kernel) || WIFSIGNALED(estado_kernel)) {
         printf("\n[%d]+  Stopped  %s\n", actual->idInterno, actual->comando);
 }
 }
+pid_primer_plano = 0;
 }
 void builtin_exit(Job* cabeza) {
     Job* actual = cabeza;
@@ -79,7 +81,7 @@ if (execvp(comando->instruccion, comando->argumentos) == -1) {
             exit(1); 
         }
 }else{
-Insertar_job(lista_jobs, pid, comando->instruccion,0);
+Insertar_job(lista_jobs, pid, comando->instruccion,1);
 Job * trabajo=Buscar_job_porpid(pid,*lista_jobs);
 int id=trabajo->idInterno;
 printf("[%d] %d\n", id, pid);
