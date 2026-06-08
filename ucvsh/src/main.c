@@ -12,13 +12,17 @@
 #include "../include/modos_shell.h"
 //# {} [] > < || &&
 //crea la estructura de los jobs por cada proceso hecho por Corina att val
-    Job* lista_jobs = NULL;
+extern Job* lista_jobs;
 extern void error_o_liberar(Comando* comando, int numero);
 extern Comando* procesar_c(char *linea_picada, int *numero);
 //variables que debo usar para capturar que comando se esta pasando a segundo plano att val
 extern volatile pid_t pid_primer_plano;
 extern char comando_primer_plano[1024];
+
+
+
 int main(){
+    lista_jobs = NULL;
     char* ruta_home= getenv("HOME");
     char ruta_historial[1024]; //por el tamaño de linea
     

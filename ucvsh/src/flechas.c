@@ -34,6 +34,7 @@ int leer_actual(char* leido, size_t tamano){
 
     habilitar_no_canonico(&modo);
 
+    char escrito_actual[TAM_LINEAS]="";
     int caracter_ingresado;
     size_t posicion = 0;//posicion actual en la terminal
     int i = total_historial; //inicio el recorrido desde el fondo para que sepa hacia donde va a subir
@@ -74,7 +75,12 @@ int leer_actual(char* leido, size_t tamano){
                 switch(direccion){
                     case 'A':
                     // esta corresponde a mi flecha hacia arriba, es decir, traeme el ultimo comando que ejecute
+                    
                     if (i > 0) {
+                        if (i == total_historial && !strcmp(escrito_actual,"")) {
+                            strncpy(escrito_actual, leido, tamano - 1);
+                            escrito_actual[tamano - 1] = '\0';
+                        }
                         i--;
                         borrar(&posicion);
                         // Copio el historial que vamos a poner en la terminal para editarse
@@ -93,8 +99,10 @@ int leer_actual(char* leido, size_t tamano){
 
                         if (i == total_historial) {
                             // Si volvimos abajo del todo, mostramos la línea vacía original
+                            strncpy(leido, escrito_actual, tamano);
                             leido[0] = '\0';
                             posicion = 0; //ya estoy al final no vas a bajar mas
+
                         } else {
                             strncpy(leido, arreglo_memoria[i], tamano);
                             posicion = strlen(leido);
@@ -104,6 +112,12 @@ int leer_actual(char* leido, size_t tamano){
                         
                     }
                     continue;
+                    break;
+                    case 'C'://derecha
+
+                    break;
+                    case 'D'://izquierda
+
                     break;
                 }
             }
