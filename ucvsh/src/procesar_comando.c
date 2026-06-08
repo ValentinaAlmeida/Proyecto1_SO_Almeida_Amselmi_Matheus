@@ -34,6 +34,18 @@
     char *linea_copia = strdup(linea_picada);
     int cant_c = 0;
     
+    int k=0;
+    int hay_comilla=0;
+    while(linea_copia[k]!='\0'){
+        if((linea_copia[k]=='\'') || (linea_copia[k]=='\"')){
+            hay_comilla=1;
+        }
+        if(hay_comilla==1 && ((linea_copia[k]=='\t') || (linea_copia[k]==' ')|| (linea_copia[k]=='  '))){
+            linea_copia[k]=='\x04';// le meto un caracter no imprimible cualquiera y que no se pone en carpetas o archivo, así me aseguro que el problema de espacios no sea problema
+        }
+
+    }
+
     char* verificar = strtok(linea_copia, " \n\t");
     while(verificar != NULL) {
         
@@ -74,6 +86,7 @@
     comando[0].r_entrada=NULL;
     comando[0].r_salida=NULL;
     comando[0].orden = 0;
+    comando[0].bandera_2plano = 0;
 
     int cambio=0;
 
@@ -107,6 +120,7 @@
             comando[i].cant_argumentos=0;
             comando[i].modo=0;
             comando[i].orden = 0;
+            comando[i].bandera_2plano = 0;
             cambio=1;
 
         }else if(strcmp(palabra,"||")== 0){
@@ -119,6 +133,7 @@
             comando[i].cant_argumentos=0;
             comando[i].modo=0;
             comando[i].orden = 0;
+            comando[i].bandera_2plano = 0;
             cambio=1;
         }else if(strcmp(palabra,"&&")== 0){ //si este funciono hago el siguiente
             comando[i].modo=2;
@@ -130,6 +145,7 @@
             comando[i].cant_argumentos=0;
             comando[i].modo=0;
             comando[i].orden = 0;
+            comando[i].bandera_2plano = 0;
             cambio=1;
         }else if(strcmp(palabra,";")== 0){//indica que ejecuta el de la izquierda y luego el de la derecha de forma incondicional
             comando[i].modo=3;
@@ -141,6 +157,7 @@
             comando[i].cant_argumentos=0;
             comando[i].modo=0;
             comando[i].orden = 0;
+            comando[i].bandera_2plano = 0;
             cambio=1;
         }else if(strcmp(palabra,"<")== 0){//redirección de entrada
             palabra= strtok(NULL, " \n\t");//me muevo a la palabra siguiente que debe ser el nombre de un archivo
@@ -172,18 +189,102 @@
             if(comando[i].r_entrada == NULL){
                 comando[i].orden = 2;
             }
-        }else{ //simplemente es algun argumento que hace algo
-            //strpbrk verifica si alguno es de los caracteres especiales de operaciones, recorre todo y lo busca si lo consigue retorna la posicion
-            if (strpbrk(palabra, "&|;><") != NULL) {// para contemplar el caso que se le ocurrio a una de mis compañeras de tener un &&&
-                printf("Error ha escrito mal su comando, no puede tener operadores seguidos como pasa en: '%s'\n", palabra);
+        } else { 
+
+            size_t tam_linea = strlen(palabra);
+            size_t anterior_final=((tam_linea) - 1);
+
+            // Primero, si llegó aquí puede ser que sea el & para que vaya a segundo plano y deba activar la bandera extra.
+            if (strcmp(palabra, "&") == 0) {
+                comando[i].bandera_2plano = 1; 
+                char* siguiente = strtok(NULL, " \n\t");
+                if (siguiente != NULL) {//significa que hay algo más y como ya probé los && entonces no es algo valido
+                    printf("Error: solo de puede tener un & al final de cada comando \n");
+                    error_o_liberar(comando, i+1);
+                    *numero = 0;
+                    return NULL;
+                }
+                break; //Salte del ciclo porque no necesitoq ue siga bajando
+            }
+
+            if ((palabra[anterior_final] == '&') && (tam_linea >=2)) {
+            //si el carácter antes del final nulo es &, verifico si el tamaño es mayor o igual a 2, porque ya verifique que && no está y si está y luego hay nulo que dicte error, Pero si hay un tercero, ya es error de sintaxis. O puede darse el caso que este pegado y debo ver. 
+            //Problema, si el de antes es un & también, eso es sospechoso porque ya pasó el &&, así que debe ser algo como &&&&&&& o &&&|&& por ejemplo, y eso es error. Sino puede ser comando& Y que se olvidarán el espacio Pero sigue siendo válido.
+
+                if (palabra[(anterior_final) - 1] != '&') { 
+
+                    //si existe el segundo &, si es así muere como error de sintaxis, Pero como no es error de una prendo la bandera
+                    comando[i].bandera_2plano = 1;
+                    palabra[anterior_final] = '\0'; //como está pegado el argumento, para evitar problemas le quito el & y dejo el argumento tranquilito
+                    int l=0;
+                    while(linea_copia[l]!='\0'){
+                        if(linea_copia[l]=='\x04'){//revierto el cambio por si las dudas
+                        linea_copia[l]==' ';
+                        }
+            
+                    }
+                    comando[i].argumentos[num_arg] = strdup(palabra);
+                    num_arg++;
+                    comando[i].cant_argumentos = num_arg;
+                    char* siguiente = strtok(NULL, " \n\t");//corto el siguiente y vuelvo a asegurarme de que el final sea nulo, porque después del & no puede haber nada, si piensa ir a segundo plano, así que hago una validación como la que tiene &&
+                        if (siguiente != NULL) {
+                            printf("Error en la sintaxis, únicamente se puede colocar el & al final para pasar a segundo plano, no se acepta combinado con otros parámetros\n");
+                            error_o_liberar(comando, i + 1);
+                            *numero = 0;
+                            return NULL;
+                        }
+                    break;
+                }
+            }
+            //Si en caso remoto llega hasta aquí, es que por ejemplo tengo un caso como &&|& que no contemplan las validaciones anteriores y es error.
+            if (strpbrk(palabra, "&|;><") != NULL) { //busca hasta que consigues alguno de esos en el argumento y devuelve su dirección 
+                printf("Error: Ha escrito mal su comando, puede ser que uso muchos operadores que no deberían estar juntos o ha escrito mal, su problema exacto es: '%s'\n", palabra);
                 error_o_liberar(comando, i + 1);
                 *numero = 0;
                 return NULL;
             }
-            comando[i].argumentos[num_arg]=strdup(palabra);
+            //Cualquier otra cosa Normal cae aquí y también las comillas, que las voy a quitar para facilidad del módulo de procesamiento 
+
+            if(palabra[0]=='\'' && tam_linea>=2){
+                if(palabra[anterior_final]== '\''){
+
+                    for(int j=1;j<(anterior_final);j++){
+                    palabra[j-1]=palabra[j];
+                    }
+                palabra[(anterior_final)-1]='\0';
+                tam_linea=(anterior_final-1);
+                }else{
+                    printf("Error de sintaxis, uso incorrecto de comillas simples\n");
+                    error_o_liberar(comando, i + 1);
+                    *numero = 0;
+                    return NULL;
+                }
+            }else if(palabra[0]=='\"'&& tam_linea>=2){
+                if(palabra[anterior_final]== '\"'){
+                    for(int j=1;j<(anterior_final);j++){
+                        palabra[j-1]=palabra[j];
+                    }
+                palabra[(anterior_final)-1]='\0';
+                tam_linea=(anterior_final-1);
+                }else{
+                    printf("Error de sintaxis, uso incorrecto de comillas dobles\n");
+                    error_o_liberar(comando, i + 1);
+                    *numero = 0;
+                    return NULL;
+                }
+            }
+            int l=0;
+            while(linea_copia[l]!='\0'){//revierto cambios antes de guardar finalmente todo
+                if(linea_copia[l]=='\x04'){
+                    linea_copia[l]==' ';
+                }
+            
+            }
+
+            comando[i].argumentos[num_arg] = strdup(palabra);
             num_arg++;
-            comando[i].cant_argumentos=num_arg;
-        }
+            comando[i].cant_argumentos = num_arg;
+        }  
 
     }
     if (cambio == 1) {
