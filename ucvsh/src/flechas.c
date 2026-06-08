@@ -19,14 +19,16 @@ void habilitar_no_canonico(struct termios* modo){
 void habilitar_canonico(struct termios* modo){
     tcsetattr(STDIN_FILENO, TCSAFLUSH, modo);//aplico lo mismo del final de arriba, pero ahora va a su configuracion inicial de nuevo
 }
+
 void borrar(size_t *posicion){
 
         while (*posicion > 0) {
-        printf("\b \b");
-        (*posicion)--;
+        printf("\b \b");//mueve puntero un posicion atras, pone el espacio en blanco y luego mueve de nuevo el cursor a la izquierda así queda el cursor en la posicion del espacio
+        (*posicion)--;//disminuyo uno la variable que tiene mi posicion actual
         }
-        fflush(stdout);
+        fflush(stdout);//me aseguro que imprima antes de continuar
 }
+
 int leer_actual(char* leido, size_t tamano){
     struct termios modo;
 
@@ -68,7 +70,10 @@ int leer_actual(char* leido, size_t tamano){
             int direccion = getchar();//que direccion es
 
             if (siguiente == '[') {
-                if (direccion == 'A') { // esta corresponde a mi flecha hacia arriba, es decir, traeme el ultimo comando que ejecute
+                
+                switch(direccion){
+                    case 'A':
+                    // esta corresponde a mi flecha hacia arriba, es decir, traeme el ultimo comando que ejecute
                     if (i > 0) {
                         i--;
                         borrar(&posicion);
@@ -79,7 +84,8 @@ int leer_actual(char* leido, size_t tamano){
                         fflush(stdout);
                     }
                     continue;
-                } else if (direccion == 'B') { // FLECHA ABAJO
+                    break;
+                    case 'B': //flecha abajo
                     if (i < total_historial) {//porque no puedo logicamente bajas mas si estoy en el ultimo comando
                         i++; //para bajar
                         
@@ -93,10 +99,12 @@ int leer_actual(char* leido, size_t tamano){
                             strncpy(leido, arreglo_memoria[i], tamano);
                             posicion = strlen(leido);
                             printf("%s", leido);
+                            fflush(stdout);
                         }
-                        fflush(stdout);
+                        
                     }
                     continue;
+                    break;
                 }
             }
             continue;

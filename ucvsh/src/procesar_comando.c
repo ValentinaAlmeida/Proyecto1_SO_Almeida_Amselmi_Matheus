@@ -40,10 +40,10 @@
         if((linea_copia[k]=='\'') || (linea_copia[k]=='\"')){
             hay_comilla=1;
         }
-        if(hay_comilla==1 && ((linea_copia[k]=='\t') || (linea_copia[k]==' ')|| (linea_copia[k]=='  '))){
-            linea_copia[k]=='\x04';// le meto un caracter no imprimible cualquiera y que no se pone en carpetas o archivo, así me aseguro que el problema de espacios no sea problema
+        if(hay_comilla==1 && ((linea_copia[k]=='\t') || (linea_copia[k]==' '))){
+            linea_copia[k]='\x04';// le meto un caracter no imprimible cualquiera y que no se pone en carpetas o archivo, así me aseguro que el problema de espacios no sea problema
         }
-
+        k++;
     }
 
     char* verificar = strtok(linea_copia, " \n\t");
@@ -54,7 +54,6 @@
         }
         verificar = strtok(NULL, " \n\t");
     }
-    free(linea_copia);
 
     *numero= (cant_c+1);
 
@@ -74,6 +73,8 @@
         //error porque no puede empezar con pipe, and, or o ; ni las redirecciones
         printf("error\n");
         printf("Error sintáctico: Comando no puede empezar sin instruccion\n");
+        *numero = 0;
+        free(comando);
         return NULL;
     }
     //como ya me traje la primera palabra entonces la voy a guardar
@@ -89,6 +90,8 @@
     comando[0].bandera_2plano = 0;
 
     int cambio=0;
+
+    free(linea_copia);
 
     while(palabra != NULL){
         palabra= strtok(NULL, " \n\t");
@@ -216,12 +219,12 @@
                     //si existe el segundo &, si es así muere como error de sintaxis, Pero como no es error de una prendo la bandera
                     comando[i].bandera_2plano = 1;
                     palabra[anterior_final] = '\0'; //como está pegado el argumento, para evitar problemas le quito el & y dejo el argumento tranquilito
-                    int l=0;
-                    while(linea_copia[l]!='\0'){
-                        if(linea_copia[l]=='\x04'){//revierto el cambio por si las dudas
-                        linea_copia[l]==' ';
+                    int l2=0;
+                    while(palabra[l2]!='\0'){
+                        if(palabra[l2]=='\x04'){//revierto el cambio por si las dudas
+                        palabra[l2]=' ';
                         }
-            
+                        l2++;
                     }
                     comando[i].argumentos[num_arg] = strdup(palabra);
                     num_arg++;
@@ -274,11 +277,11 @@
                 }
             }
             int l=0;
-            while(linea_copia[l]!='\0'){//revierto cambios antes de guardar finalmente todo
-                if(linea_copia[l]=='\x04'){
-                    linea_copia[l]==' ';
+            while(palabra[l]!='\0'){//revierto cambios antes de guardar finalmente todo
+                if(palabra[l]=='\x04'){
+                    palabra[l]=' ';
                 }
-            
+                l++;
             }
 
             comando[i].argumentos[num_arg] = strdup(palabra);

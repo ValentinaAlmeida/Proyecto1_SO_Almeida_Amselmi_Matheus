@@ -9,6 +9,7 @@
 #include "../include/job_list.h"
 #include "../include/historial_comandos.h"
 #include "../include/signals.h"
+#include "../include/modos_shell.h"
 //# {} [] > < || &&
 
 extern void error_o_liberar(Comando* comando, int numero);
@@ -34,7 +35,7 @@ int main(){
     char* linea_copia=NULL;
     char* impresion="ucvsh";
 
-    size_t tamano=0;
+    
     //crea la estructura de los jobs por cada proceso hecho por Corina att val
     Job* lista_jobs = NULL;
     //aqui va el while true pero no lo voy a poner hasta que vea que funciona todo :) attm ale
@@ -88,7 +89,7 @@ int main(){
         free(linea_original);
         free(linea_copia);
         linea_copia = NULL;  // Puntero a NULL vital para el próximo getline
-        tamano = 0;
+        
     } // Aquí cierra
 
     return 0;
