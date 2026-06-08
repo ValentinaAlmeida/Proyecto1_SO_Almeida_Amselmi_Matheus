@@ -11,7 +11,8 @@
 #include "../include/signals.h"
 #include "../include/modos_shell.h"
 //# {} [] > < || &&
-
+//crea la estructura de los jobs por cada proceso hecho por Corina att val
+    Job* lista_jobs = NULL;
 extern void error_o_liberar(Comando* comando, int numero);
 extern Comando* procesar_c(char *linea_picada, int *numero);
 //variables que debo usar para capturar que comando se esta pasando a segundo plano att val
@@ -38,6 +39,7 @@ int main(){
     
     //crea la estructura de los jobs por cada proceso hecho por Corina att val
     Job* lista_jobs = NULL;
+    
     //aqui va el while true pero no lo voy a poner hasta que vea que funciona todo :) attm ale
 
     printf("%s", impresion);
@@ -79,8 +81,11 @@ int main(){
                 error_o_liberar(comando, numero); // Limpiamos el comando antes de salir
                 builtin_exit(lista_jobs);         // Esta función ya tiene el exit(0) adentro
             }
-            else {
-                // Si no fue ninguno de mis builtins, es un comando externo
+        else {
+                if (comando->bandera_2plano == 0) {
+                    strcpy(comando_primer_plano, comando[0].instruccion);
+                }
+
                 ejecutar_comando(comando, numero);
                 error_o_liberar(comando, numero);
             }
@@ -94,4 +99,5 @@ int main(){
 
     return 0;
 }
+
 }
