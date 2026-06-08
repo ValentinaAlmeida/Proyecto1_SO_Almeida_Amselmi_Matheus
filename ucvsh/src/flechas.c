@@ -77,7 +77,7 @@ int leer_actual(char* leido, size_t tamano){
                     // esta corresponde a mi flecha hacia arriba, es decir, traeme el ultimo comando que ejecute
                     
                     if (i > 0) {
-                        if (i == total_historial && !strcmp(escrito_actual,"")) {
+                        if (i == total_historial) {
                             strncpy(escrito_actual, leido, tamano - 1);
                             escrito_actual[tamano - 1] = '\0';
                         }
@@ -85,6 +85,7 @@ int leer_actual(char* leido, size_t tamano){
                         borrar(&posicion);
                         // Copio el historial que vamos a poner en la terminal para editarse
                         strncpy(leido, arreglo_memoria[i], tamano);
+                        leido[tamano-1]='\0';
                         posicion = strlen(leido);
                         printf("%s", leido);
                         fflush(stdout);
@@ -99,17 +100,16 @@ int leer_actual(char* leido, size_t tamano){
 
                         if (i == total_historial) {
                             // Si volvimos abajo del todo, mostramos la línea vacía original
-                            strncpy(leido, escrito_actual, tamano);
-                            leido[0] = '\0';
-                            posicion = 0; //ya estoy al final no vas a bajar mas
+                            strncpy(leido, escrito_actual, tamano-1);
+                            leido[tamano-1] = '\0';
 
                         } else {
-                            strncpy(leido, arreglo_memoria[i], tamano);
-                            posicion = strlen(leido);
-                            printf("%s", leido);
-                            fflush(stdout);
+                            strncpy(leido, arreglo_memoria[i], tamano-1);
+                            leido[tamano-1] = '\0';
                         }
-                        
+                        posicion = strlen(leido);
+                        printf("%s", leido);
+                        fflush(stdout);
                     }
                     continue;
                     break;
