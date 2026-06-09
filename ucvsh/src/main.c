@@ -10,6 +10,7 @@
 #include "../include/historial_comandos.h"
 #include "../include/signals.h"
 #include "../include/modos_shell.h"
+#include "../include/colores.h"
 //# {} [] > < || &&
 //crea la estructura de los jobs por cada proceso hecho por Corina att val
 extern Job* lista_jobs;
