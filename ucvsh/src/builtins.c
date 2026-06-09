@@ -4,6 +4,8 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <signal.h>
+#include <string.h>
+
 extern volatile pid_t pid_primer_plano;
 void builtin_jobs(Job* cabeza){
 int estado_kernel;
@@ -14,7 +16,7 @@ if (resultado > 0) {
             //el proceso cmabio de estado, debo saber que el paso, uso las senales de la doc de waitpid
             
             if (WIFEXITED(estado_kernel) || WIFSIGNALED(estado_kernel)) {
-          
+
                 actual->estado = 3; // lo terminaron
             } 
             else if (WIFSTOPPED(estado_kernel)) {
@@ -89,4 +91,52 @@ printf("[%d] %d\n", id, pid);
 
 }
 
+}
+
+
+void builtin_cd(Comando* comando_actual) {
+    char* destino_final = NULL;
+    char ruta_actual_antes[1024];
+
+    // Se respalda el directorio actual antes de realizar el cambio de ruta
+    if (getcwd(ruta_actual_antes, sizeof(ruta_actual_antes)) == NULL) {
+        perror("ucvsh: cd: getcwd");
+        return;
+    }
+
+    // El usuario escribe cd sin argumentos 
+    if (comando_actual->cant_argumentos == 0) {
+        destino_final = getenv("HOME");
+        if (destino_final == NULL) {
+            fprintf(stderr, "ucvsh: cd: No se pudo obtener la variable de entorno HOME\n");
+            return;
+        }
+    } 
+    //  "cd -" (Regresa al directorio anterior)
+    else if (strcmp(comando_actual->argumentos[0], "-") == 0) {
+        destino_final = getenv("OLDPWD");
+        if (destino_final == NULL) {
+            fprintf(stderr, "ucvsh: cd: OLDPWD no se encuentra definido\n");
+            return;
+        }
+        //Se imprime la ruta a la que regresa cuando se usuario 
+        printf("%s\n", destino_final);
+    } 
+    // El usuario especifica una ruta normal
+    else {
+        destino_final = comando_actual->argumentos[0];
+    }
+
+    // Se invoca la llamada al sistema para cambiar de directorio 
+    if (chdir(destino_final) == 0) {
+        char ruta_actual_despues[1024];
+        if (getcwd(ruta_actual_despues, sizeof(ruta_actual_despues)) != NULL) {
+            // Se actualizan las variables de entorno actual y anterior 
+            setenv("OLDPWD", ruta_actual_antes, 1);
+            setenv("PWD", ruta_actual_despues, 1);
+        }
+    } else {
+        // Muestra un mensaje error si carpeta no está, simplemente o lo coloco mal o ya verá que hace 
+        perror("ucvsh: cd");
+    }
 }

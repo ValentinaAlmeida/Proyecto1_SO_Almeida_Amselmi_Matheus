@@ -10,4 +10,6 @@ void builtin_fg(Job** cabeza, int id_job);
 void builtin_exit(Job* cabeza);
 //funcion que pasa a segundo plano segun el parser de Corina
 void builtin_bg(Job ** lista_jobs,Comando * comando);
+//funcion para el comando cd
+void builtin_cd(Comando* comando_actual);
 #endif

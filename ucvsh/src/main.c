@@ -41,9 +41,7 @@ int main(){
     char* impresion="ucvsh";
 
     
-    //crea la estructura de los jobs por cada proceso hecho por Corina att val
-    Job* lista_jobs = NULL;
-    
+        
     //aqui va el while true pero no lo voy a poner hasta que vea que funciona todo :) attm ale
 
     printf("%s", impresion);
@@ -69,30 +67,13 @@ int main(){
 
         //segun el comando reviso si es un builtin
         if(comando != NULL){ // si es null hubo fallo
-            char* cmd_nombre = comando->instruccion;
+            if (comando->bandera_2plano == 0) {
+                strcpy(comando_primer_plano, comando[0].instruccion);
+            }
 
-            if (strcmp(cmd_nombre, "jobs") == 0) {
-                builtin_jobs(lista_jobs);
-                error_o_liberar(comando, numero);
-            }
-            else if (strcmp(cmd_nombre, "fg") == 0) {
-                int id_trabajo = (comando->cant_argumentos > 0) ? atoi(comando->argumentos[0]) : 1;
-
-                builtin_fg(&lista_jobs, id_trabajo);
-                error_o_liberar(comando, numero);
-            }
-            else if (strcmp(cmd_nombre, "exit") == 0) {
-                error_o_liberar(comando, numero); // Limpiamos el comando antes de salir
-                builtin_exit(lista_jobs);         // Esta función ya tiene el exit(0) adentro
-            }
-        else {
-                if (comando->bandera_2plano == 0) {
-                    strcpy(comando_primer_plano, comando[0].instruccion);
-                }
-
-                ejecutar_comando(comando, numero);
-                error_o_liberar(comando, numero);
-            }
+            ejecutar_comando(comando, numero);
+            error_o_liberar(comando, numero);
+            
         }
 
         free(linea_original);

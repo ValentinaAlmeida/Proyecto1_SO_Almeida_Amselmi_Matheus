@@ -8,12 +8,17 @@
 #include "../include/path.h"
 #include "../include/redireccion.h"
 #include "../include/pipes.h"
+#include "../include/job_list.h"
+#include "../include/builtins.h"
 
+
+extern Job* lista_jobs;
 
 int es_builtin(char *instruccion){
     return strcmp(instruccion, "cd") == 0 ||
             strcmp(instruccion, "exit") == 0 ||
-            strcmp(instruccion, "jobs") == 0;
+            strcmp(instruccion, "jobs") == 0 || 
+            strcmp(instruccion, "fg") == 0;
 }
 
 void ejecutar_en_hijo(Comando *cmd){
@@ -83,32 +88,52 @@ int ejecutar_uno(Comando *cmd){
         exit(1);
     }
     free(ruta);
-    int status;
-    waitpid(pid, &status, 0);
     free(args);
-    return WEXITSTATUS(status);
+
+    if(cmd->bandera_2plano == 1){
+        Insertar_job(&lista_jobs, pid, cmd->instruccion,1);
+        return 0;
+    }else{
+        int status;
+        waitpid(pid, &status, 0);
+        return WEXITSTATUS(status);
+    }
+
 }
 
 void ejecutar_comando(Comando *comandos, int numero){
     int i=0;
     while(i<numero){
         if(es_builtin(comandos[i].instruccion)) {
-            printf("Lo sentimos, el comando %s no está implementado por que es un builtin\n", comandos[i].instruccion);
+            if(strcmp(comandos[i].instruccion, "cd") == 0){
+                builtin_cd(&comandos[i]);
+            } else if(strcmp(comandos[i].instruccion, "exit") == 0){
+                builtin_exit(lista_jobs);
+            } else if(strcmp(comandos[i].instruccion, "jobs") == 0){
+                builtin_jobs(lista_jobs);
+            } else if(strcmp(comandos[i].instruccion, "fg") == 0){
+                int id = (comandos[i].cant_argumentos > 0) ? atoi(comandos[i].argumentos[0]) : 1;
+                builtin_fg(&lista_jobs, id);
+            }
             i++;
         }else{
             if(comandos[i].hay_tuberia==1){
-                int codigo_salida=ejecutar_pipe(&comandos[i], &comandos[i+1]);
-                if(comandos[i+1].modo==1){
+                int fin = i;
+                while(comandos[fin].hay_tuberia == 1){
+                    fin++;
+                }
+                int codigo_salida=ejecutar_cadena_pipes(comandos, i, fin);
+                if(comandos[fin].modo==1){
                     if(codigo_salida==0){
                         break;
                     }
-                }else if(comandos[i+1].modo==2){
+                }else if(comandos[fin].modo==2){
                     if(codigo_salida!=0){
                         break;
                     }
                 }
                 
-                i=i+2;
+                i=fin + 1;
             }else{
                 
                 int codigo_salida=ejecutar_uno(&comandos[i]);

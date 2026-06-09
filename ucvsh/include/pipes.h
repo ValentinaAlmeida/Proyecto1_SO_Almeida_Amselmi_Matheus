@@ -3,7 +3,7 @@
 
 #include "../include/estructura_comando.h"
 
-int ejecutar_pipe(Comando *izquierda, Comando *derecha);
+int ejecutar_cadena_pipes(Comando *comandos, int inicio, int fin);
 
 
 #endif
