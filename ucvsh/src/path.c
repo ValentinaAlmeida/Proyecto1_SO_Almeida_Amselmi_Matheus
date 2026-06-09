@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include "../include/path.h"
+#include "../include/colores.h"
 
 char *buscar_en_path(char *instruccion){
     char *path_env = getenv("PATH");

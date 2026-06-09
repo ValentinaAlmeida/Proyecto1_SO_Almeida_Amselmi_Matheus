@@ -4,7 +4,8 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include "../include/signals.h"
-#include "../include/job_list.h" 
+#include "../include/job_list.h"
+#include "../include/colores.h" 
 
 // VARIABLES GLOBALES DE SEÑALES
 volatile pid_t pid_primer_plano = 0;

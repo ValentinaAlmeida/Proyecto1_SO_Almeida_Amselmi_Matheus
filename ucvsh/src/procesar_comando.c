@@ -3,6 +3,7 @@
  #include <string.h>
  #include <stdlib.h>
  #include "../include/estructura_comando.h"
+ #include "../include/colores.h"
 
  void error_o_liberar(Comando* comando, int numero) {//multiuso, o por error o liberacion
     if (comando == NULL) {//simplemente no me escribieron nada

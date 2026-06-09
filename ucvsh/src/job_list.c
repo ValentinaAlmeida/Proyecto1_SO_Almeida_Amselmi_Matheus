@@ -4,6 +4,7 @@
 #include "job_list.h"
 #include <sys/types.h>
 #include <string.h>
+#include "../include/colores.h"
 //Funciones que va a usar la lista
 //buscar job
 Job* Buscar_job_porpid(pid_t id, Job* lista_jobs){

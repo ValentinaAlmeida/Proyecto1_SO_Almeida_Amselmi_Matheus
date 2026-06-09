@@ -8,6 +8,7 @@
 #include "../include/path.h"
 #include "../include/redireccion.h"
 #include "../include/pipes.h"
+#include "../include/colores.h"
 
 
 int es_builtin(char *instruccion){

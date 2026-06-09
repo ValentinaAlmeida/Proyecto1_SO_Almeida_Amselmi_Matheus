@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <signal.h>
+#include "../include/colores.h"
 extern volatile pid_t pid_primer_plano;
 void builtin_jobs(Job* cabeza){
 int estado_kernel;

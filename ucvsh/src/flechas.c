@@ -4,6 +4,7 @@
 #include <string.h>
 #include "../include/modos_shell.h"
 #include "../include/historial_comandos.h"
+#include "../include/colores.h"
 
 #define BARRERA 7
 

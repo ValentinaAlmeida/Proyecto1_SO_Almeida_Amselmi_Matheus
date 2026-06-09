@@ -6,6 +6,7 @@
 #include "../include/ejecutar.h"
 #include "../include/estructura_comando.h"
 #include "../include/redireccion.h"
+#include "../include/colores.h"
 
 int ejecutar_pipe(Comando *izquierda, Comando *derecha) {
     int fd[2];
