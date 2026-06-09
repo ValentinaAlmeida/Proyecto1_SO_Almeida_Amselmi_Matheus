@@ -16,5 +16,5 @@
  }Comando;
 
  Comando* procesar_c(char *linea_picada, int* numero); //como voy a llenarlo
-
+ extern int todo_2plano;
  #endif

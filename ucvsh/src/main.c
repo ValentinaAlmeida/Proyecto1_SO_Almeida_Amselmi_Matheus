@@ -41,18 +41,19 @@ int main(){
     char* linea_copia=NULL;
     char* impresion="ucvsh";
 
-    
-        
-    //aqui va el while true pero no lo voy a poner hasta que vea que funciona todo :) attm ale
 
-    printf(MORADO "%s" LETRA_NORMAL, impresion);
-    printf(MORADO "%s" LETRA_NORMAL,"> ");
-    fflush(stdout);
     //aqui va lo de los ctrl, es el ulitmo modulo de valentina
     //ya hice el modulo, manejamos Ctrl+C, Ctrl+Z
     Manejadores_senales();
 
-    if (leer_actual(linea_intermedia, sizeof(linea_intermedia)) != -1) {
+    while(1){
+    printf(MORADO "%s" LETRA_NORMAL, impresion);
+    printf(MORADO "%s" LETRA_NORMAL,"> ");
+    fflush(stdout);
+
+        if (leer_actual(linea_intermedia, sizeof(linea_intermedia)) == -1) {
+            break; 
+        }
             
         if (strlen(linea_intermedia) > 0) {
     
@@ -76,14 +77,12 @@ int main(){
             error_o_liberar(comando, numero);
             
         }
-
         free(linea_original);
         free(linea_copia);
         linea_copia = NULL;  // Puntero a NULL vital para el próximo getline
+        linea_original=NULL;
+        }
         
-    } // Aquí cierra
-
-    return 0;
-}
-
+    }
+return 0;
 }

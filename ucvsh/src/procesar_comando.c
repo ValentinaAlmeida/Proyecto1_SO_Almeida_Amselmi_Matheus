@@ -5,6 +5,8 @@
  #include "../include/estructura_comando.h"
  #include "../include/colores.h"
 
+ int todo_2plano=0;
+
  void error_o_liberar(Comando* comando, int numero) {//multiuso, o por error o liberacion
     if (comando == NULL) {//simplemente no me escribieron nada
         return;
@@ -31,20 +33,32 @@
 }
 
  Comando* procesar_c(char *linea_picada, int *numero){
-
+    todo_2plano=0;
     char *linea_copia = strdup(linea_picada);
     int cant_c = 0;
     
     int k=0;
-    int hay_comilla=0;
-    while(linea_copia[k]!='\0'){
-        if((linea_copia[k]=='\'') || (linea_copia[k]=='\"')){
-            hay_comilla=1;
+    char hay_comilla= 0;//nulo 
+
+    while (linea_picada[k] != '\0') {
+        if (linea_picada[k] == '\'' || linea_picada[k] == '\"') {//si es comilla simple o doble debo quitarlas
+            if (hay_comilla == 0) {
+                hay_comilla = linea_picada[k]; // Es la primera comilla
+            } else if (hay_comilla == linea_picada[k]) {
+                hay_comilla = 0; // es la última comilla
+            }
         }
-        if(hay_comilla==1 && ((linea_copia[k]=='\t') || (linea_copia[k]==' '))){
-            linea_copia[k]='\x04';// le meto un caracter no imprimible cualquiera y que no se pone en carpetas o archivo, así me aseguro que el problema de espacios no sea problema
+        // Mientras permanezca dentro de mis comillas, debo sustituir los espacios por un caracter no imprimible para que no los quite o corte mal
+        if (hay_comilla != 0 && (linea_picada[k] == ' ' || linea_picada[k] == '\t')) {//si encuentro espacio o tabulador
+            linea_picada[k] = '\x04'; 
         }
         k++;
+    }
+    if (hay_comilla != 0) {//si al final no estaba la misma comilla y termino de picar sin devolver todo a la normalidad, entonces debo reportar error
+        printf(ROJO "Error sintáctico: " LETRA_NEGRITA);
+        printf("Comillas sin cerrar en la línea de comandos.\n");
+        *numero = 0;
+        return NULL;
     }
 
     char* verificar = strtok(linea_copia, " \n\t");
@@ -64,7 +78,7 @@
     int num_arg=0;
 
     char* palabra= strtok(linea_picada, " \n\t");//corta hasta que veas el primer espacio, salto de linea o tabulador
-    //veo si la primera es exit, si lo es no tiene sentido guardarla, simpemente salgo de una
+    
     if (palabra == NULL) {
         *numero = 0;
         free(comando);
@@ -72,8 +86,8 @@
     }
     if(strcmp(palabra,"|")== 0 || strcmp(palabra,"&&")== 0||strcmp(palabra,";")== 0 ||strcmp(palabra,"<")== 0 ||strcmp(palabra,">")== 0){
         //error porque no puede empezar con pipe, and, or o ; ni las redirecciones
-        printf("error\n");
-        printf("Error sintáctico: Comando no puede empezar sin instruccion\n");
+        printf(ROJO "Error sintáctico: "LETRA_NEGRITA);
+        printf("Comando no puede empezar sin instruccion\n");
         *numero = 0;
         free(comando);
         return NULL;
@@ -104,7 +118,8 @@
         if(cambio==1){
             
             if(strcmp(palabra,"|")== 0 || strcmp(palabra,"||")== 0 || strcmp(palabra,"&&")== 0 || strcmp(palabra,";")== 0 || strcmp(palabra,"<")== 0 || strcmp(palabra,">")== 0) {
-                printf("Error de sintaxis, no se pueden tener juntos esos dos operadores\n");
+                printf(ROJO "Error sintáctico: "LETRA_NEGRITA);
+                printf("No se pueden tener juntos esos dos operadores\n");
                 error_o_liberar(comando, i + 1); // libero todo por error
                 *numero = 0;
                 return NULL;
@@ -166,7 +181,8 @@
         }else if(strcmp(palabra,"<")== 0){//redirección de entrada
             palabra= strtok(NULL, " \n\t");//me muevo a la palabra siguiente que debe ser el nombre de un archivo
             if(palabra == NULL || strcmp(palabra,"|")== 0 || strcmp(palabra,"||")== 0 || strcmp(palabra,"&&")== 0 || strcmp(palabra,";")== 0 || strcmp(palabra,"<")== 0 || strcmp(palabra,">")== 0){
-                printf("Error de sintaxis, eso no es una redirección valida'<', se espera un archivo \n");
+                printf(ROJO "Error sintáctico: "LETRA_NEGRITA);
+                printf("Esto no es una redirección valida'<', se espera un archivo \n");
                 error_o_liberar(comando, i + 1);
                 *numero = 0;
                 return NULL;
@@ -180,7 +196,8 @@
         }else if(strcmp(palabra,">")== 0){ //redirección de salida
             palabra= strtok(NULL, " \n\t");//me muevo a la palabra siguiente que debe ser el nombre de un archivo
             if(palabra == NULL || strcmp(palabra,"|")== 0 || strcmp(palabra,"||")== 0 || strcmp(palabra,"&&")== 0 || strcmp(palabra,";")== 0 || strcmp(palabra,"<")== 0 || strcmp(palabra,">")== 0){
-                printf("Error de sintaxis, eso no es una redirección valida'>', se espera un archivo \n");
+                printf(ROJO "Error sintáctico: "LETRA_NEGRITA);
+                printf("Esto no es una redirección valida'>', se espera un archivo \n");
                 error_o_liberar(comando, i + 1);
                 *numero = 0;
                 return NULL;
@@ -199,26 +216,37 @@
             size_t anterior_final=((tam_linea) - 1);
 
             // Primero, si llegó aquí puede ser que sea el & para que vaya a segundo plano y deba activar la bandera extra.
-            if (strcmp(palabra, "&") == 0) {
-                comando[i].bandera_2plano = 1; 
-                char* siguiente = strtok(NULL, " \n\t");
-                if (siguiente != NULL) {//significa que hay algo más y como ya probé los && entonces no es algo valido
-                    printf("Error: solo de puede tener un & al final de cada comando \n");
-                    error_o_liberar(comando, i+1);
+            if (strcmp(palabra, "&") == 0) {//significa que hay algo más y como ya probé los && entonces no es algo valido
+                if (i == cant_c) { // si es el último comando de la línea entera
+                    comando[i].bandera_2plano = 1; 
+                    todo_2plano=1;
+                    char* siguiente = strtok(NULL, " \n\t");
+                    if (siguiente != NULL) {
+                        printf(ROJO "Error sintáctico: "LETRA_NEGRITA);
+                        printf("Solo se puede tener un solo & al final de toda la línea\n");
+                        error_o_liberar(comando, i + 1);
+                        *numero = 0;
+                        return NULL;
+                    }
+                    break;
+                } else { // NO es el último comando debe fallar
+                    printf(ROJO "Error sintáctico: "LETRA_NEGRITA);
+                    printf("El símbolo de background '&' solo puede ir al final de toda la línea\n");
+                    error_o_liberar(comando, i + 1);
                     *numero = 0;
                     return NULL;
                 }
-                break; //Salte del ciclo porque no necesitoq ue siga bajando
             }
-
+            
             if ((palabra[anterior_final] == '&') && (tam_linea >=2)) {
             //si el carácter antes del final nulo es &, verifico si el tamaño es mayor o igual a 2, porque ya verifique que && no está y si está y luego hay nulo que dicte error, Pero si hay un tercero, ya es error de sintaxis. O puede darse el caso que este pegado y debo ver. 
             //Problema, si el de antes es un & también, eso es sospechoso porque ya pasó el &&, así que debe ser algo como &&&&&&& o &&&|&& por ejemplo, y eso es error. Sino puede ser comando& Y que se olvidarán el espacio Pero sigue siendo válido.
 
                 if (palabra[(anterior_final) - 1] != '&') { 
-
+                    if (i == cant_c) {
                     //si existe el segundo &, si es así muere como error de sintaxis, Pero como no es error de una prendo la bandera
                     comando[i].bandera_2plano = 1;
+                    todo_2plano=1;
                     palabra[anterior_final] = '\0'; //como está pegado el argumento, para evitar problemas le quito el & y dejo el argumento tranquilito
                     int l2=0;
                     while(palabra[l2]!='\0'){
@@ -232,17 +260,27 @@
                     comando[i].cant_argumentos = num_arg;
                     char* siguiente = strtok(NULL, " \n\t");//corto el siguiente y vuelvo a asegurarme de que el final sea nulo, porque después del & no puede haber nada, si piensa ir a segundo plano, así que hago una validación como la que tiene &&
                         if (siguiente != NULL) {
-                            printf("Error en la sintaxis, únicamente se puede colocar el & al final para pasar a segundo plano, no se acepta combinado con otros parámetros\n");
+                            printf(ROJO "Error sintáctico: "LETRA_NEGRITA);
+                            printf("Únicamente se puede colocar el & al final para pasar a segundo plano, no se acepta combinado con otros parámetros\n");
                             error_o_liberar(comando, i + 1);
                             *numero = 0;
                             return NULL;
                         }
                     break;
-                }
+                    }else{
+                        printf(ROJO "Error sintáctico: "LETRA_NEGRITA);
+                        printf("Únicamente se puede colocar el símbolo de background '&' al final de todo el comando");
+                        error_o_liberar(comando, i + 1);
+                        *numero = 0;
+                        return NULL;  
+                    }
+                 }
             }
             //Si en caso remoto llega hasta aquí, es que por ejemplo tengo un caso como &&|& que no contemplan las validaciones anteriores y es error.
             if (strpbrk(palabra, "&|;><") != NULL) { //busca hasta que consigues alguno de esos en el argumento y devuelve su dirección 
-                printf("Error: Ha escrito mal su comando, puede ser que uso muchos operadores que no deberían estar juntos o ha escrito mal, su problema exacto es: '%s'\n", palabra);
+                printf(ROJO "Error sintáctico: "LETRA_NEGRITA);
+                printf("Ha escrito mal su comando, puede ser que uso muchos operadores que no deberían estar juntos o ha escrito mal, su problema exacto es: ");
+                printf(AMARILLO "'%s'\n" LETRA_NEGRITA, palabra);
                 error_o_liberar(comando, i + 1);
                 *numero = 0;
                 return NULL;
@@ -258,7 +296,8 @@
                 palabra[(anterior_final)-1]='\0';
                 tam_linea=(anterior_final-1);
                 }else{
-                    printf("Error de sintaxis, uso incorrecto de comillas simples\n");
+                    printf(ROJO "Error sintáctico: "LETRA_NEGRITA);
+                    printf("Uso incorrecto de comillas simples\n");
                     error_o_liberar(comando, i + 1);
                     *numero = 0;
                     return NULL;
@@ -271,7 +310,8 @@
                 palabra[(anterior_final)-1]='\0';
                 tam_linea=(anterior_final-1);
                 }else{
-                    printf("Error de sintaxis, uso incorrecto de comillas dobles\n");
+                    printf(ROJO "Error sintáctico: "LETRA_NEGRITA);
+                    printf("Uso incorrecto de comillas dobles\n");
                     error_o_liberar(comando, i + 1);
                     *numero = 0;
                     return NULL;
@@ -292,7 +332,8 @@
 
     }
     if (cambio == 1) {
-        printf("Error de sintaxis, luego de los operadores se debe incluir una instrucción no puede colocar un espacio en blanco\n");
+        printf(ROJO "Error sintáctico: "LETRA_NEGRITA);
+        printf("Luego de los operadores se debe incluir una instrucción no puede colocar un espacio en blanco\n");
         error_o_liberar(comando, i + 1);
         *numero = 0;
         return NULL;

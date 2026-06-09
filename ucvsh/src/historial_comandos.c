@@ -32,7 +32,7 @@ void carga_inicial(const char* ruta){
 
 void reiniciar_arreglo_historial(char* linea_original){
     for(int i=1; i<CANT_RECORDAR; i++){
-        strcpy(arreglo_memoria[i-1], arreglo_memoria[i]);
+        strcpy(arreglo_memoria[i-1], arreglo_memoria[i]);//ruedo todo un espacio para abrirle hueco al nuevo
     }
     strncpy(arreglo_memoria[CANT_RECORDAR-1], linea_original, TAM_LINEAS);
 }//basicamente un swapping donde si se llenan los 1024 espacios, agarro y borro el primero de mi pseudo cahce del historial y añado el nuevo
@@ -43,8 +43,8 @@ void editar_historial(char* linea_original, const char* ruta){
         return; //casos donde es invalido que si quiera escriba algo en el archivo
     }
 
-   FILE* nombre_historial= fopen(ruta,"a");
-    if(nombre_historial==NULL){
+   FILE* nombre_historial= fopen(ruta,"a");//abro el archivo como append para poder incluir al final del archivo
+    if(nombre_historial==NULL){//no abrio el archivo
         return;
     } 
     
