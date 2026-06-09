@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "../include/historial_comandos.h"
+#include "../include/colores.h"
 
 //#{}[] < >  || &&
 

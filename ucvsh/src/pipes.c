@@ -8,6 +8,7 @@
 #include "../include/redireccion.h"
 #include "../include/pipes.h"
 #include "../include/job_list.h"
+#include "../include/colores.h"
 
 extern Job* lista_jobs;
 

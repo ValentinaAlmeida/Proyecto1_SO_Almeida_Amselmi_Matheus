@@ -10,6 +10,7 @@
 #include "../include/historial_comandos.h"
 #include "../include/signals.h"
 #include "../include/modos_shell.h"
+#include "../include/colores.h"
 //# {} [] > < || &&
 //crea la estructura de los jobs por cada proceso hecho por Corina att val
 extern Job* lista_jobs;
@@ -44,8 +45,8 @@ int main(){
         
     //aqui va el while true pero no lo voy a poner hasta que vea que funciona todo :) attm ale
 
-    printf("%s", impresion);
-    printf("%s",">");
+    printf(MORADO "%s" LETRA_NORMAL, impresion);
+    printf(MORADO "%s" LETRA_NORMAL,"> ");
     fflush(stdout);
     //aqui va lo de los ctrl, es el ulitmo modulo de valentina
     //ya hice el modulo, manejamos Ctrl+C, Ctrl+Z

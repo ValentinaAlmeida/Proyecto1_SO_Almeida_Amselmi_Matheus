@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include "../include/redireccion.h"
+#include "../include/colores.h"
 
 int redirigir_salida(char *archivo){
     int fd=open(archivo, O_WRONLY | O_CREAT | O_TRUNC, 0644);
