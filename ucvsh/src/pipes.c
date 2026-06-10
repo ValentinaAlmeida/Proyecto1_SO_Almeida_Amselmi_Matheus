@@ -11,6 +11,7 @@
 #include "../include/colores.h"
 
 extern Job* lista_jobs;
+extern int todo_2plano;
 
 int ejecutar_cadena_pipes(Comando *comandos, int inicio, int fin) {
     
@@ -67,7 +68,7 @@ int ejecutar_cadena_pipes(Comando *comandos, int inicio, int fin) {
     
     int ultimo_status=0;
     for(int i = 0; i < N; i++) {
-        if(comandos[inicio + i].bandera_2plano == 1){
+        if(todo_2plano == 1){
             Insertar_job(&lista_jobs, pids[i], comandos[inicio + i].instruccion,1);
         }else{
             int status;
