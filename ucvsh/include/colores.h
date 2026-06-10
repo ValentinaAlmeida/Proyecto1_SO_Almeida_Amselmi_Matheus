@@ -11,5 +11,6 @@
 #define VERDE "\033[1;32m"  // Verde
 #define AMARILLO "\033[1;33m"  // Amarillo
 #define MORADO "\033[1;35m" //morado
+#define ROSA_CHICLE   "\033[1;38;5;206m"
 
 #endif

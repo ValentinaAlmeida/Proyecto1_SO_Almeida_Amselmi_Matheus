@@ -34,10 +34,11 @@ MostrarJobs(cabeza);//ahora si, imprimo la lista actualizada
 void builtin_fg(Job** cabeza, int id_job){
 Job *actual = Buscar_job_porid(id_job,*cabeza);//busco el trabajo
 if(actual == NULL){//si no esta , es porque no existe
+printf(ROJO "Error: "LETRA_NEGRITA);
 printf("Trabajo no encontrado, intente otra vez \n");
 return;
 }
-printf("trayendo a primer plano :%s",actual->comando);
+printf(VERDE "trayendo a primer plano :%s" LETRA_NORMAL,actual->comando);
 pid_primer_plano = actual->pgid;
 kill(actual->pgid, SIGCONT);//esperar a el hijo y decirle que continue
 actual->estado = 1;//modificamos el estado leugo defino el numero para los que corren en segundo plano
@@ -50,8 +51,8 @@ if (WIFEXITED(estado_kernel) || WIFSIGNALED(estado_kernel)) {
         }else if(WIFSTOPPED(estado_kernel)) {
 
         //no se terino de forma normal, lo detuvieron
-        actual->estado=2;//el que determine leugo que rayos es detenido
-        printf("\n[%d]+  Stopped  %s\n", actual->idInterno, actual->comando);
+        actual->estado=2;//el que determine luego que rayos es detenido
+        printf(AMARILLO "\n[%d]+  Stopped  %s\n" LETRA_NORMAL, actual->idInterno, actual->comando);
 }
 }
 pid_primer_plano = 0;
@@ -59,7 +60,7 @@ pid_primer_plano = 0;
 void builtin_exit(Job* cabeza) {
     Job* actual = cabeza;
     
-    printf("Cerrando ucvsh... ¡Hasta luego!\n");
+    printf(ROSA_CHICLE"Cerrando ucvsh... ¡Hasta luego!\n");
 
     // Matamos los procesos uno a uno para que no se queden por alli  
     while (actual != NULL) {
@@ -76,18 +77,18 @@ void builtin_exit(Job* cabeza) {
 void builtin_bg(Job ** lista_jobs,Comando * comando){
 pid_t pid= fork();
 if(pid<0){
-perror("Hubo en fallo para el proceso en segundo plano, intente otra vez");
+perror(ROJO"Hubo en fallo para el proceso en segundo plano, intente otra vez" LETRA_NEGRITA);
 return;
 }else if(pid==0){
 if (execvp(comando->instruccion, comando->argumentos) == -1) {
-            perror("Error al ejecutar el comando en segundo plano");
+            perror(ROJO"Error: problemas al ejecutar el comando en segundo plano"LETRA_NEGRITA);
             exit(1); 
         }
 }else{
 Insertar_job(lista_jobs, pid, comando->instruccion,1);
 Job * trabajo=Buscar_job_porpid(pid,*lista_jobs);
 int id=trabajo->idInterno;
-printf("[%d] %d\n", id, pid);
+printf(AMARILLO"[%d] %d\n"LETRA_NORMAL, id, pid);
 
 
 }
@@ -101,7 +102,7 @@ void builtin_cd(Comando* comando_actual) {
 
     // Se respalda el directorio actual antes de realizar el cambio de ruta
     if (getcwd(ruta_actual_antes, sizeof(ruta_actual_antes)) == NULL) {
-        perror("ucvsh: cd: getcwd");
+        perror(ROJO"ucvsh: cd: getcwd"LETRA_NEGRITA);
         return;
     }
 
@@ -109,7 +110,7 @@ void builtin_cd(Comando* comando_actual) {
     if (comando_actual->cant_argumentos == 0) {
         destino_final = getenv("HOME");
         if (destino_final == NULL) {
-            fprintf(stderr, "ucvsh: cd: No se pudo obtener la variable de entorno HOME\n");
+            fprintf(stderr, ROJO "ucvsh: cd: No se pudo obtener la variable de entorno HOME\n" LETRA_NEGRITA);
             return;
         }
     } 
@@ -117,7 +118,7 @@ void builtin_cd(Comando* comando_actual) {
     else if (strcmp(comando_actual->argumentos[0], "-") == 0) {
         destino_final = getenv("OLDPWD");
         if (destino_final == NULL) {
-            fprintf(stderr, "ucvsh: cd: OLDPWD no se encuentra definido\n");
+            fprintf(stderr, ROJO "ucvsh: cd: OLDPWD no se encuentra definido\n" LETRA_NEGRITA);
             return;
         }
         //Se imprime la ruta a la que regresa cuando se usuario 
@@ -138,6 +139,6 @@ void builtin_cd(Comando* comando_actual) {
         }
     } else {
         // Muestra un mensaje error si carpeta no está, simplemente o lo coloco mal o ya verá que hace 
-        perror("ucvsh: cd");
+        perror(ROJO"ucvsh: cd"LETRA_NEGRITA);
     }
 }

@@ -45,8 +45,8 @@ int main(){
     //aqui va lo de los ctrl, es el ulitmo modulo de valentina
     //ya hice el modulo, manejamos Ctrl+C, Ctrl+Z
     Manejadores_senales();
-
     while(1){
+    
     printf(MORADO "%s" LETRA_NORMAL, impresion);
     printf(MORADO "%s" LETRA_NORMAL,"> ");
     fflush(stdout);
