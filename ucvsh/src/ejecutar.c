@@ -14,6 +14,7 @@
 
 
 extern Job* lista_jobs;
+extern int todo_2plano; 
 
 int es_builtin(char *instruccion){
     return strcmp(instruccion, "cd") == 0 ||
@@ -91,7 +92,7 @@ int ejecutar_uno(Comando *cmd){
     free(ruta);
     free(args);
 
-    if(cmd->bandera_2plano == 1){
+    if(todo_2plano == 1){
         Insertar_job(&lista_jobs, pid, cmd->instruccion,1);
         return 0;
     }else{
