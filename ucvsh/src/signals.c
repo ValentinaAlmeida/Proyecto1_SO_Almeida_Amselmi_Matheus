@@ -3,6 +3,7 @@
 #include <signal.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <termios.h>
 #include "../include/signals.h"
 #include "../include/job_list.h"
 #include "../include/colores.h" 
@@ -18,7 +19,13 @@ void capturar_senal(int senal){
         if (pid_primer_plano > 0) {
             kill(pid_primer_plano, SIGINT);
         } else {
-            printf("\nucvsh> ");
+            struct termios modo;//lo mismo del codigo del no canonico de flechas.h para reactivar o pasaban cosas raras cuando probamos
+            tcgetattr(STDIN_FILENO, &modo);
+            modo.c_lflag |= (ICANON | ECHO);
+            tcsetattr(STDIN_FILENO, TCSAFLUSH, &modo);
+
+            // 2. Imprimimos el prompt exactamente igual al del main (Morado y protegido)
+            printf("\n" MORADO "ucvsh" LETRA_NORMAL MORADO "> " LETRA_NORMAL);
             fflush(stdout);
         }
     } 
@@ -33,11 +40,20 @@ void capturar_senal(int senal){
             } else {
                 Insertar_job(&lista_jobs, pid_primer_plano, comando_primer_plano, 2);
             }
+            struct termios modo;
+            tcgetattr(STDIN_FILENO, &modo);
+            modo.c_lflag |= (ICANON | ECHO);
+            tcsetattr(STDIN_FILENO, TCSAFLUSH, &modo);
 
-            printf("\n[Detenido] Usa 'jobs' o 'fg' para gestionarlo\nucvsh> ");
+            printf("\n[Detenido] Usa 'jobs' o 'fg' para gestionarlo\n" MORADO "ucvsh" LETRA_NORMAL MORADO "> " LETRA_NORMAL);
             fflush(stdout);
         } else {
-            printf("\nucvsh> ");
+            struct termios modo;
+            tcgetattr(STDIN_FILENO, &modo);
+            modo.c_lflag |= (ICANON | ECHO);
+            tcsetattr(STDIN_FILENO, TCSAFLUSH, &modo);
+
+            printf("\n" MORADO "ucvsh" LETRA_NORMAL MORADO "> " LETRA_NORMAL);
             fflush(stdout);
         }
     }
@@ -50,9 +66,9 @@ void Manejadores_senales(){
     sa.sa_flags = SA_RESTART; 
 
     if (sigaction(SIGINT, &sa, NULL) == -1) {
-        perror("Error al configurar SIGINT");
+        perror(ROJO"Error al configurar SIGINT"LETRA_NEGRITA);
     }
     if (sigaction(SIGTSTP, &sa, NULL) == -1) {
-        perror("Error al configurar SIGTSTP");
+        perror(ROJO"Error al configurar SIGTSTP"LETRA_NEGRITA);
     }
 }

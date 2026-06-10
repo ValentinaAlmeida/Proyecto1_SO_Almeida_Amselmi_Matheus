@@ -36,13 +36,14 @@ int leer_actual(char* leido, size_t tamano){
     struct termios modo;
 
     habilitar_no_canonico(&modo);
-
+    memset(leido, 0, tamano);//inicializo todo en 0 https://www.ibm.com/docs/es/i/7.5.0?topic=functions-memset-set-bytes-value
+    
     char escrito_actual[TAM_LINEAS]="";
     int caracter_ingresado;
     size_t posicion = 0;//posicion actual en la terminal
     int i = total_historial; //inicio el recorrido desde el fondo para que sepa hacia donde va a subir
     int tam_actual=0;
-    memset(leido, 0, tamano);//inicializo todo en 0 https://www.ibm.com/docs/es/i/7.5.0?topic=functions-memset-set-bytes-value
+    
 
     while(1){
 
