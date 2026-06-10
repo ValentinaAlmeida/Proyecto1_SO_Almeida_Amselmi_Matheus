@@ -1,3 +1,4 @@
+//# {} [] > < || &&
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
@@ -31,7 +32,7 @@ void capturar_senal(int senal){
     } 
     else if (senal == SIGTSTP){ // Ctrl+Z
         if (pid_primer_plano > 0) {
-            kill(pid_primer_plano, SIGSTOP); // Pausa el proceso hijo
+            kill(pid_primer_plano, SIGTSTP); // Pausa el proceso hijo
             
             // Buscamos el proceso en la lista para cambiar su estado al número 2
             Job* trabajo = Buscar_job_porpid(pid_primer_plano, lista_jobs);
@@ -72,3 +73,4 @@ void Manejadores_senales(){
         perror(ROJO"Error al configurar SIGTSTP"LETRA_NEGRITA);
     }
 }
+//# {} [] > < || &&

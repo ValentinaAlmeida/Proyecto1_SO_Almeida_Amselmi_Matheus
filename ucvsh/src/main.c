@@ -72,7 +72,7 @@ int main(){
             if (comando->bandera_2plano == 0) {
                 strcpy(comando_primer_plano, comando[0].instruccion);
             }
-
+            
             ejecutar_comando(comando, numero);
             error_o_liberar(comando, numero);
             
