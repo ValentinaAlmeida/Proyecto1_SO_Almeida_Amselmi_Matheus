@@ -57,7 +57,7 @@ int builtin_fg(Job** cabeza, int id_job){
     return retorno_status;
 }
 
-void builtin_exit(Job* cabeza){
+int builtin_exit(Job* cabeza){
     Job *actual = cabeza;
     printf(ROSA_CHICLE "Cerrando ucvsh... ¡Hasta luego!\n");
     while(actual != NULL){
@@ -68,24 +68,6 @@ void builtin_exit(Job* cabeza){
     exit(0);
 }
 
-int builtin_bg(Job **lista_jobs, Comando *comando){
-    pid_t pid = fork();
-    if(pid < 0){
-        perror(ROJO "Hubo un fallo para el proceso en segundo plano" LETRA_NEGRITA);
-        return 1;
-    } else if(pid == 0){
-        if(execvp(comando->instruccion, comando->argumentos) == -1){
-            perror(ROJO "Error: problemas al ejecutar el comando en segundo plano" LETRA_NEGRITA);
-            exit(1);
-        }
-    } else {
-        Insertar_job(lista_jobs, pid, comando->instruccion, 1);
-        Job *trabajo = Buscar_job_porpid(pid, *lista_jobs);
-        int id = trabajo->idInterno;
-        printf(AMARILLO "[%d] %d\n" LETRA_NORMAL, id, pid);
-    }
-    return 0;
-}
 int builtin_bg(Job **lista_jobs, Comando *comando){
     pid_t pid = fork();
     if(pid < 0){
