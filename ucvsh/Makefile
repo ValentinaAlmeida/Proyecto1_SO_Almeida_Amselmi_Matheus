@@ -17,6 +17,3 @@ build/%.o: src/%.c
 
 clean:
 	rm -f $(OBJ) $(BIN)
-
-run: $(BIN)
-	./$(BIN)
