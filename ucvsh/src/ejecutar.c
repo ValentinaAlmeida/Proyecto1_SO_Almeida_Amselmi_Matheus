@@ -34,7 +34,7 @@ void ejecutar_en_hijo(Comando *cmd){
     }
     args[cmd->cant_argumentos + 1] = NULL;
     execv(ruta, args);
-    perror("Error al ejecutar el comando");
+    perror(ROJO"Error al ejecutar el comando"LETRA_NEGRITA);
     exit(1);
 }
 
@@ -42,7 +42,7 @@ int ejecutar_uno(Comando *cmd){
     char *ruta=buscar_en_path(cmd->instruccion);
     
     if(ruta==NULL){
-        fprintf(stderr, "Error: comando no encontrado: %s\n", cmd->instruccion);
+        fprintf(stderr, ROJO "Error: comando no encontrado: %s\n" LETRA_NEGRITA, cmd->instruccion);
         return -1;
     }
 
@@ -56,7 +56,7 @@ int ejecutar_uno(Comando *cmd){
     pid_t pid=fork();
 
     if(pid==-1){
-        perror("Error al crear el proceso hijo");
+        perror(ROJO"Error al crear el proceso hijo"LETRA_NEGRITA);
         return -1;
     }
     if(pid==0){
@@ -84,7 +84,7 @@ int ejecutar_uno(Comando *cmd){
             }
         
         execv(ruta, args);
-        perror("Error al ejecutar el comando");
+        perror(ROJO"Error al ejecutar el comando"LETRA_NEGRITA);
         
         exit(1);
     }

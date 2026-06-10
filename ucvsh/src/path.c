@@ -8,13 +8,13 @@
 char *buscar_en_path(char *instruccion){
     char *path_env = getenv("PATH");
     if(path_env==NULL){
-        fprintf(stderr, "Error: PATH no está definido\n");
+        fprintf(stderr, ROJO"Error: PATH no está definido\n"LETRA_NEGRITA);
         return NULL;
     }
 
     char *path_copia=strdup(path_env);
     if(path_copia==NULL){
-        perror("Error al duplicar la cadena PATH");
+        perror(ROJO"Error al duplicar la cadena PATH"LETRA_NEGRITA);
         return NULL;
     }
 

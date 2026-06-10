@@ -58,7 +58,7 @@ void Insertar_job(Job** cabeza, pid_t id_proceso,const char*comando,int estado){
 void Eliminar_Job(Job** cabeza,int id_job){
 // si la cabeza e nula es porque todavia no hay jobs no hay nada que eliminar 
 if(*cabeza == NULL){
-    printf("No hay Jobs todavia!\n");
+    printf(AMARILLO"No hay Jobs todavia!\n"LETRA_NORMAL);
     return;
 }
 //una nodo tmeporal para movernos en la lista.
@@ -75,7 +75,7 @@ while(temp->next != NULL && temp->next->idInterno != id_job){//busco su anterior
     temp=temp->next;
 }
 if(temp == NULL || temp->next == NULL){
-    printf("Usted esta fuera de rango, este id no existe \n");
+    printf(ROJO"Usted esta fuera de rango, este id no existe \n"LETRA_NEGRITA);
     return;
 }
 //si lo enconre preservo el siguiente a el que voy a eliminar 
@@ -93,7 +93,7 @@ void CambiarEstadoJob(Job** cabeza, int id_job, int estado_nuevo){
         jobCambiado->estado=estado_nuevo;
         return;
     }else{
-        printf("Intente de nuevo, job no encontrado \n");
+        printf(ROJO"Intente de nuevo, job no encontrado \n"LETRA_NEGRITA);
     }
 }
 //esta es la mas fuerte, si se me va un nodo, se nos frego el proyecto, en fin, veamos que tal
