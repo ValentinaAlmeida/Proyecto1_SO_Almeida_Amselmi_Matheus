@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "../include/colores.h"
+
 extern volatile pid_t pid_primer_plano;
 int builtin_jobs(Job* cabeza){
     int estado_kernel;

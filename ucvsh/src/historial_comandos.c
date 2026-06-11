@@ -19,8 +19,12 @@ void carga_inicial(const char* ruta){//al iniciar el programa debe de traerse de
 
     while(fgets(linea,sizeof(linea),nombre_historial)!=NULL){//obtiene la línea
 
-        if(total_historial>= (CANT_RECORDAR)){//si llego al numero máximo que puedo traerme a la memoria, paro
-            break;
+        if(total_historial>= (CANT_RECORDAR)){//si llego al numero máximo que puedo traerme a la memoria, debo rodar todo si necesito meter uno nuevo, para mantener los más recientes
+            for(int i = 1; i < CANT_RECORDAR; i++){
+                strcpy(arreglo_memoria[i-1], arreglo_memoria[i]);//ruedo todo un espacio a la izquierda
+            }
+            //guardo el nuevo en el último puesto que ahora si esta disponible
+            strncpy(arreglo_memoria[CANT_RECORDAR-1], linea, TAM_LINEAS);
         }
         linea[strcspn(linea, "\n")]='\0';//quito el salto de linea para que no traiga problemas con las flechas
         strncpy(arreglo_memoria[total_historial], linea, TAM_LINEAS);//copio en el arreglo

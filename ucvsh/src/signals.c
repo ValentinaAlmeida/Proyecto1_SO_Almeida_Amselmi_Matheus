@@ -8,6 +8,7 @@
 #include "../include/signals.h"
 #include "../include/job_list.h"
 #include "../include/colores.h" 
+#include "../include/modos_shell.h"
 
 // VARIABLES GLOBALES DE SEÑALES
 volatile pid_t pid_primer_plano = 0;
@@ -21,8 +22,12 @@ void capturar_senal(int senal){
             kill(pid_primer_plano, SIGINT);
         } else {
             
-            printf("\n");
+            printf("^C\n");
+            printf(MORADO"ucvsh> "LETRA_NORMAL);
             fflush(stdout);
+            struct termios modo;
+            habilitar_no_canonico(&modo);
+            
         }
     } 
     else if (senal == SIGTSTP){ // Ctrl+Z
@@ -30,7 +35,10 @@ void capturar_senal(int senal){
             kill(pid_primer_plano, SIGTSTP); // Pausa el proceso hijo
         } else{
             printf("\n");
+            printf(MORADO"ucvsh> "LETRA_NORMAL);
             fflush(stdout);
+            struct termios modo;
+            habilitar_no_canonico(&modo);
         }
     }
 }

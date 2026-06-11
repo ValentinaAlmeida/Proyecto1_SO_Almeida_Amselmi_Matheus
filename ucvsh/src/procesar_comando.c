@@ -7,6 +7,19 @@
 
  int todo_2plano=0;
 
+ static void limpiar(char* palabra) {
+    if (palabra == NULL){
+        return;
+    } 
+    int l2=0;
+    while(palabra[l2]!='\0'){
+        if(palabra[l2]=='\x04'){//revierto el cambio para que el caracter no imprimible vuelva a ser espacio
+            palabra[l2]=' ';
+        }
+        l2++;
+    }
+}
+
  void error_o_liberar(Comando* comando, int numero) {//multiuso, o por error o liberacion
     if (comando == NULL) {//simplemente no me escribieron nada
         return;
@@ -95,6 +108,7 @@
     }
     //como ya me traje la primera palabra entonces la voy a guardar
     //inicializo de base mi primer elemento del struct
+    limpiar(palabra);
     comando[0].instruccion= strdup(palabra); //guardo mi instrucción
     comando[0].argumentos=(char**)calloc(256,(sizeof(char*)));
     comando[0].hay_tuberia=0;
@@ -126,6 +140,7 @@
                 return NULL;
             }
             cambio=0;//devuelvo la bandera a su sitio
+            limpiar(palabra);
             comando[i].instruccion= strdup(palabra);//guardo la instruccion
             continue;//que vuelva a ejecutar el while porque no necesito que siga leyendo los ifs de abajo
         }
@@ -186,6 +201,7 @@
                 return NULL;
             }
             if(palabra != NULL){
+                limpiar(palabra);
                 comando[i].r_entrada=strdup(palabra);//guarda el argumento de redirección
             }
             if(comando[i].r_salida == NULL){
@@ -203,6 +219,7 @@
             }
             
             if(palabra != NULL){
+                limpiar(palabra);
                 comando[i].r_salida=strdup(palabra);//si el argumento no es vacío guardalo
             }
 
@@ -247,13 +264,7 @@
                     comando[i].bandera_2plano = 1;
                     todo_2plano=1;
                     palabra[anterior_final] = '\0'; //como está pegado el argumento, para evitar problemas le quito el & y dejo el argumento tranquilito
-                    int l2=0;
-                    while(palabra[l2]!='\0'){
-                        if(palabra[l2]=='\x04'){//revierto el cambio para que el caracter no imprimible vuelva a ser espacio
-                        palabra[l2]=' ';
-                        }
-                        l2++;
-                    }
+                    limpiar(palabra);
                     comando[i].argumentos[num_arg] = strdup(palabra);//guardo la cadena
                     num_arg++;
                     comando[i].cant_argumentos = num_arg;
@@ -316,13 +327,7 @@
                     return NULL;//si retorna nulo el sabe que fallo y no tiene que llegar al executer
                 }
             }
-            int l=0;
-            while(palabra[l]!='\0'){//revierto cambios antes de guardar finalmente todo
-                if(palabra[l]=='\x04'){//si ve el no imprimible que puse para que no se coma los espacios strtok entonces lo cambio por espacio
-                    palabra[l]=' ';
-                }
-                l++;
-            }
+            limpiar(palabra);
 
             comando[i].argumentos[num_arg] = strdup(palabra);//guardo en mi arreglo de argumentos
             num_arg++;//incremento el número
@@ -330,6 +335,8 @@
         }  
 
     }
+
+    
     if (cambio == 1) {//si llega aquí es que el ultimo era un operador lógico y no puede quedarse solo
         printf(ROJO LETRA_NEGRITA "Error sintáctico: "LETRA_NORMAL);
         printf("Luego de los operadores se debe incluir una instrucción no puede colocar un espacio en blanco\n");
@@ -338,6 +345,7 @@
         return NULL;
     }
 
+    
     comando[i].argumentos[num_arg]=NULL;//cierro delimitando el ultimo elemento como nulo
     *numero = i + 1;
     return comando;//retorno el inicializado para que se ingrese al del main y todas lo puedan usar
