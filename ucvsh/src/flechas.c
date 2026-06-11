@@ -56,7 +56,7 @@ int leer_actual(char* leido, size_t tamano){
 
         //si da enter, primero debo terminar la cadena que estaba procesando, y luego se hace lo demas, para que no quede inconsistente
         if (caracter_ingresado == '\n') {
-            leido[posicion] = '\0';
+            leido[tam_actual] = '\0';
             putchar('\n');//pongo el salto de linea al final
             break;
         }
