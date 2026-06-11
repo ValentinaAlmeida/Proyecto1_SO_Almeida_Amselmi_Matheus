@@ -12,10 +12,10 @@ int total_historial=0;
 
 void carga_inicial(const char* ruta){//al iniciar el programa debe de traerse del archivo del historial lo que haya y quepa en el espacio que reservé
     FILE* nombre_historial= fopen(ruta,"r");//abro el documento en modo lectura
-    if(nombre_historial==NULL){
+    if(nombre_historial==NULL){//si el archivo no abrió resulta nulo no puedo hacer nada
         return;
     }
-    char linea[TAM_LINEAS];
+    char linea[TAM_LINEAS];//creo una cadena para ir guardando las lineas que voy buscando del historial
 
     while(fgets(linea,sizeof(linea),nombre_historial)!=NULL){//obtiene la línea
 
