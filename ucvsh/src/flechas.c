@@ -24,7 +24,7 @@ void habilitar_canonico(struct termios* modo){
     tcsetattr(STDIN_FILENO, TCSAFLUSH, modo);//aplico lo mismo del final de arriba, pero ahora va a su configuracion inicial de nuevo
 }
 
-void borrar(size_t *posicion){
+void borrar(size_t *posicion){//para moverme visualmente poner el espacio en su lugar y volver a moverme visualmente
 
         while (*posicion > 0) {
         printf("\b \b");//mueve puntero un posicion atras, pone el espacio en blanco y luego mueve de nuevo el cursor a la izquierda así queda el cursor en la posicion del espacio
@@ -47,24 +47,24 @@ int leer_actual(char* leido, size_t tamano){
     int tam_actual=0;
     
 
-    while(1){
+    while(1){//para ir capturando en tiempo real los caracteres del no canónico
 
         caracter_ingresado = getchar(); //obtengo el caracter
 
         if (caracter_ingresado == EOF) {//si se desactiva no tengo porque seguir en esta funcion
-            habilitar_canonico(&modo);
+            habilitar_canonico(&modo);//vuelvo a mi modo canónico normalito
             return -1;//termina mal
         }
 
         //si da enter, primero debo terminar la cadena que estaba procesando, y luego se hace lo demas, para que no quede inconsistente
-        if (caracter_ingresado == '\n') {
-            leido[tam_actual] = '\0';
+        if (caracter_ingresado == '\n') {//como manejo el enter
+            leido[tam_actual] = '\0';//completo el arreglo con el nulo al fianl para que la cadena este lista
             putchar('\n');//pongo el salto de linea al final
-            break;
+            break;//rompo para volver al main
         }
         if (caracter_ingresado == '\b' || caracter_ingresado  == 127) {//para borrar cosas
             if (posicion <= 0) {//si te pasas del límite no hagas nada, no puedes borrar el promt
-                    continue;
+                    continue;//solo saltate todo y continua para evitar errores
                 }
             if (posicion > 0) {//si estoy en cualquier otra posicion en la cadena entonces verifico desde donde debo empezar a borrar
                 
@@ -140,12 +140,12 @@ int leer_actual(char* leido, size_t tamano){
                             strncpy(leido, arreglo_memoria[i], tamano-1);
                             leido[tamano-1] = '\0';
                         }
-                        posicion = strlen(leido);
-                        tam_actual=posicion;
-                        printf("%s", leido);
-                        fflush(stdout);
+                        posicion = strlen(leido);//la longitud completa
+                        tam_actual=posicion;//el tamaño actual es igual a la posición en la que estoy para saber hasta que punto del historial me quede
+                        printf("%s", leido);//reimprimo todo ya que no hay eco
+                        fflush(stdout);//vacío buffer
                     }
-                    continue;
+                    continue;//continua y no le pares a lo demás vuelve a la siguiente iteracion
                     break;
                     case 'C'://derecha
                     if (tam_actual > posicion) {
@@ -171,17 +171,17 @@ int leer_actual(char* leido, size_t tamano){
             continue;
             
     }
-    if (posicion < (tamano - 1)) {
+    if (posicion < (tamano - 1)) {//si tengo un tamao que no sobrepasa el tamao de línea que coloque
             if (posicion == tam_actual) {//si esta al final simplemente escribe
-            leido[posicion] = caracter_ingresado;
-            posicion++;
-            tam_actual++;
-            leido[tam_actual] = '\0';
+            leido[posicion] = caracter_ingresado;//inserto al final del arreglo
+            posicion++;//sumo una a la posicion actual del puntero y en este caso si se mueve solo visualmente
+            tam_actual++;//ahora el tamaño de cantidad de caracteres aumenta
+            leido[tam_actual] = '\0';//coloco el nulo para completar la cadena
             putchar(caracter_ingresado); // imprimo el caracter porque como echo esta apagado no imprime solo
             fflush(stdout);//asegurate de que todo se imprima antes de continuar
-            }else{
+            }else{//estoy en algún lugar que no es el final
 
-                for(int g=tam_actual; (int)posicion < g; g--){
+                for(int g=tam_actual; (int)posicion < g; g--){//inicio desde el final hasta donde esta el puntero y requiere abrir espacio
                     leido[g]=leido[g-1];//para evitar cortar cadenas y concatenaciones, ruedo todo un espacio hacia la derecha y ya antes vi si habia espacio
                 }
                 tam_actual++;//incremento tamaño
