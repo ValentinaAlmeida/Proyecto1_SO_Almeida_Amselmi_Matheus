@@ -7,17 +7,17 @@
 
 //#{}[] < >  || &&
 
-char arreglo_memoria[CANT_RECORDAR][TAM_LINEAS]; 
+char arreglo_memoria[CANT_RECORDAR][TAM_LINEAS]; //el arreglo de comandos que puede recordar en el historial
 int total_historial=0;
 
-void carga_inicial(const char* ruta){
-    FILE* nombre_historial= fopen(ruta,"r");
+void carga_inicial(const char* ruta){//al iniciar el programa debe de traerse del archivo del historial lo que haya y quepa en el espacio que reservé
+    FILE* nombre_historial= fopen(ruta,"r");//abro el documento en modo lectura
     if(nombre_historial==NULL){
         return;
     }
     char linea[TAM_LINEAS];
 
-    while(fgets(linea,sizeof(linea),nombre_historial)!=NULL){
+    while(fgets(linea,sizeof(linea),nombre_historial)!=NULL){//obtiene la línea
 
         if(total_historial>= (CANT_RECORDAR)){//si llego al numero máximo que puedo traerme a la memoria, paro
             break;
@@ -30,14 +30,14 @@ void carga_inicial(const char* ruta){
     fclose(nombre_historial);//cierro el archivo, todo se abre, se usa y se cierra.
 }
 
-void reiniciar_arreglo_historial(char* linea_original){
+void reiniciar_arreglo_historial(char* linea_original){//si se pasa del límite empieza a sobreescribir el último con el nuevo, luego de haber rodado todo lo demás un espacio
     for(int i=1; i<CANT_RECORDAR; i++){
         strcpy(arreglo_memoria[i-1], arreglo_memoria[i]);//ruedo todo un espacio para abrirle hueco al nuevo
     }
     strncpy(arreglo_memoria[CANT_RECORDAR-1], linea_original, TAM_LINEAS);
 }//basicamente un swapping donde si se llenan los 1024 espacios, agarro y borro el primero de mi pseudo cahce del historial y añado el nuevo
 
-void editar_historial(char* linea_original, const char* ruta){
+void editar_historial(char* linea_original, const char* ruta){//ingresar algo al historial
     
     if(linea_original==NULL || strlen(linea_original)==0 || strcmp(linea_original, "\n")==0){ 
         return; //casos donde es invalido que si quiera escriba algo en el archivo
@@ -48,15 +48,15 @@ void editar_historial(char* linea_original, const char* ruta){
         return;
     } 
     
-        fprintf(nombre_historial, "%s\n", linea_original);
-        fflush(nombre_historial);
-        fclose(nombre_historial);
+        fprintf(nombre_historial, "%s\n", linea_original);//escribo en el historial
+        fflush(nombre_historial);//me aseguro que se escriba
+        fclose(nombre_historial);//cierro el archivo
 
     if(total_historial<CANT_RECORDAR){
         strncpy(arreglo_memoria[total_historial], linea_original, TAM_LINEAS);//copio en el arreglo
         total_historial++;//aumento la cantidad de comandos que recuerdo
     }else{
-        reiniciar_arreglo_historial(linea_original);
+        reiniciar_arreglo_historial(linea_original);//si llegó al límite entonces que llame a la funcion para mover todo un espacio y quedar el de último
     }
 
 }

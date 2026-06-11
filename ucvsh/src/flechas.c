@@ -10,6 +10,7 @@
 
 void habilitar_no_canonico(struct termios* modo){
     struct termios modo2;
+    //Los siguientes links me sirvieron de investigación y consulta de los comandos que utilicçe posteriormente y deseo dejarlos a la mano
     //https://www.ibm.com/docs/es/aix/7.3.0?topic=files-termiosh-file
     //https://www.ibm.com/docs/es/aix/7.3.0?topic=t-tcgetattr-subroutine
     //https://www.ibm.com/docs/es/aix/7.3.0?topic=t-tcsetattr-subroutine
@@ -35,10 +36,11 @@ void borrar(size_t *posicion){
 int leer_actual(char* leido, size_t tamano){
     struct termios modo;
 
-    habilitar_no_canonico(&modo);
+    habilitar_no_canonico(&modo);//llama a la función que invoca el modo no canónico, es decir, permite al interprete de comandos que pueda editar, borrar, incluir y moverse, porque el canónico solo permite hacer cosas luego de dar enter, 
+    //así que el no canónico permite ir guardando en un buffer y editando y ya luego al dar enter se lleva todo
     memset(leido, 0, tamano);//inicializo todo en 0 https://www.ibm.com/docs/es/i/7.5.0?topic=functions-memset-set-bytes-value
     
-    char escrito_actual[TAM_LINEAS]="";
+    char escrito_actual[TAM_LINEAS]="";//lo que lleva escrito hasta el momento
     int caracter_ingresado;
     size_t posicion = 0;//posicion actual en la terminal
     int i = total_historial; //inicio el recorrido desde el fondo para que sepa hacia donde va a subir
@@ -61,30 +63,30 @@ int leer_actual(char* leido, size_t tamano){
             break;
         }
         if (caracter_ingresado == '\b' || caracter_ingresado  == 127) {//para borrar cosas
-            if (posicion <= 0) {
+            if (posicion <= 0) {//si te pasas del límite no hagas nada, no puedes borrar el promt
                     continue;
                 }
-            if (posicion > 0) {
+            if (posicion > 0) {//si estoy en cualquier otra posicion en la cadena entonces verifico desde donde debo empezar a borrar
                 
-                if (tam_actual==posicion) {
+                if (tam_actual==posicion) {//si es igual al tamaño estamos al final, así que simplemente borra el último caracter y no tiene que devolver visualmente la barra de escritura
                 
-                posicion--;
-                tam_actual--;
-                leido[posicion] = '\0';
+                posicion--; //disminuyo 1 en la posicion actual en la que me voy a ubicar
+                tam_actual--;//le quito 1 al tamaño actual
+                leido[posicion] = '\0';//sustituyo el último por nulo para cerrar la cadena
                 
-                printf("\b \b"); 
-                fflush(stdout);
-                }else{
+                printf("\b \b"); //muevo el cursor, imprimo vacio y vuelvo a mover el cursor a la izquierda
+                fflush(stdout);//me aseguro que imprima
+                }else{//no busca borrar al final
                     
-                    printf("\b");
-                    posicion--;
+                    printf("\b");//muevete visualmente 1 a la izquierda
+                    posicion--;//restale 1 a la posicion
                     
                     for (size_t a = posicion; a < (size_t)tam_actual; a++) {
                         leido[a] = leido[a + 1];//ruedo todo uno a la izquierda desde la posicion que borre
                     }
-                    tam_actual--;
+                    tam_actual--;//disminuyo 1 la posicion
                     
-                    leido[tam_actual] = '\0';
+                    leido[tam_actual] = '\0';//finalizo en nulo
                     printf("%s\033[K", &leido[posicion]);//vuelvo a imprimir para que se pueda ver
                 
                     for (int h2 = tam_actual; h2 > (int)posicion; h2--) {//como el cursor se movio debo devolverlo
@@ -100,28 +102,28 @@ int leer_actual(char* leido, size_t tamano){
             int siguiente = getchar();//veo si es el otro corchete que me falta
             int direccion = getchar();//que direccion es
 
-            if (siguiente == '[') {
+            if (siguiente == '[') {//es probable que se trate de una flecha, ahora a ver cual
                 
                 switch(direccion){
                     case 'A':
                     // esta corresponde a mi flecha hacia arriba, es decir, traeme el ultimo comando que ejecute
                     
                     if (i > 0) {
-                        if (i == total_historial) {
-                            strncpy(escrito_actual, leido, tamano - 1);
-                            escrito_actual[tamano - 1] = '\0';
+                        if (i == total_historial) { //si esta en el actual, es decir el último comando
+                            strncpy(escrito_actual, leido, tamano - 1);//copia al escrito actual lo que estaba en el historial en la posicion anterior
+                            escrito_actual[tamano - 1] = '\0';//cierro la cadena
                         }
                         i--;
-                        borrar(&posicion);
+                        borrar(&posicion);//borro lo actual
                         // Copio el historial que vamos a poner en la terminal para editarse
-                        strncpy(leido, arreglo_memoria[i], tamano);
-                        leido[tamano-1]='\0';
+                        strncpy(leido, arreglo_memoria[i], tamano);//sustituyo lo nuevo
+                        leido[tamano-1]='\0';//cierro cadena con null
                         posicion = strlen(leido);
                         tam_actual=posicion;
-                        printf("%s", leido);
+                        printf("%s", leido);//como esta desactivada la bandera, debo imprimir yo manualmente
                         fflush(stdout);
                     }
-                    continue;
+                    continue;//continua a la siguiente iteración sin ver lo de más abajo
                     break;
                     case 'B': //flecha abajo
                     if (i < total_historial) {//porque no puedo logicamente bajas mas si estoy en el ultimo comando
@@ -134,7 +136,7 @@ int leer_actual(char* leido, size_t tamano){
                             strncpy(leido, escrito_actual, tamano-1);
                             leido[tamano-1] = '\0';
 
-                        } else {
+                        } else {//si no estamos abajo el todo, simplemente imprimo lo que vaya después en terminal
                             strncpy(leido, arreglo_memoria[i], tamano-1);
                             leido[tamano-1] = '\0';
                         }
