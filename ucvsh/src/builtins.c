@@ -30,7 +30,7 @@ int builtin_fg(Job** cabeza, int id_job){
     Job *actual = Buscar_job_porid(id_job, *cabeza);
     if(actual == NULL){
         printf(ROJO "Error: " LETRA_NEGRITA);
-        printf("Trabajo no encontrado, intente otra vez \n");
+        printf("Trabajo no encontrado, intente otra vez \n"LETRA_NORMAL);
         return 1;
     }
     printf(VERDE "trayendo a primer plano :%s" LETRA_NORMAL, actual->comando);
