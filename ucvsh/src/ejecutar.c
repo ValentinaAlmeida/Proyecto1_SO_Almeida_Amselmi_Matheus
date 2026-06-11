@@ -43,7 +43,7 @@ int ejecutar_uno(Comando *cmd){
     char *ruta=buscar_en_path(cmd->instruccion);
     
     if(ruta==NULL){
-        fprintf(stderr, ROJO "Error: comando no encontrado: %s\n" LETRA_NEGRITA, cmd->instruccion);
+        fprintf(stderr, ROJO "Error: comando no encontrado: %s\n" LETRA_NORMAL, cmd->instruccion);
         return -1;
     }
 
