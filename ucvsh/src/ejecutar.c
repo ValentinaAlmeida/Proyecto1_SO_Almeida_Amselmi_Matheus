@@ -14,7 +14,9 @@
 
 
 extern Job* lista_jobs;
-extern int todo_2plano; 
+extern int todo_2plano;
+extern volatile pid_t pid_primer_plano;
+
 
 int es_builtin(char *instruccion){
     return strcmp(instruccion, "cd") == 0 ||
@@ -96,9 +98,11 @@ int ejecutar_uno(Comando *cmd){
         Insertar_job(&lista_jobs, pid, cmd->instruccion,1);
         return 0;
     }else{
+        pid_primer_plano = pid;
         int status;
-        waitpid(pid, &status, 0);
+        waitpid(pid, &status, WUNTRACED);
         return WEXITSTATUS(status);
+        pid_primer_plano = 0;
     }
 
 }

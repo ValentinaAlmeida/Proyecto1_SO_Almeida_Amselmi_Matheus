@@ -12,6 +12,7 @@
 
 extern Job* lista_jobs;
 extern int todo_2plano;
+extern volatile pid_t pid_primer_plano;
 
 int ejecutar_cadena_pipes(Comando *comandos, int inicio, int fin) {
     
@@ -67,17 +68,19 @@ int ejecutar_cadena_pipes(Comando *comandos, int inicio, int fin) {
         close(fd[N-2][1]);
     
     int ultimo_status=0;
+    pid_primer_plano = pids[0];
     for(int i = 0; i < N; i++) {
         if(todo_2plano == 1){
             Insertar_job(&lista_jobs, pids[i], comandos[inicio + i].instruccion,1);
         }else{
             int status;
-            waitpid(pids[i], &status, 0);
+            waitpid(pids[i], &status, WUNTRACED);
             if(i==N-1){
                 ultimo_status = WEXITSTATUS(status);
             }
         }
     }
+    pid_primer_plano = 0;
     return ultimo_status;
 }
 
