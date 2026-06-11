@@ -71,11 +71,11 @@ int builtin_exit(Job* cabeza){
 int builtin_bg(Job **lista_jobs, Comando *comando){
     pid_t pid = fork();
     if(pid < 0){
-        perror(ROJO "Hubo un fallo para el proceso en segundo plano" LETRA_NEGRITA);
+        perror(ROJO LETRA_NEGRITA "Hubo un fallo para el proceso en segundo plano" LETRA_NORMAL);
         return 1;
     } else if(pid == 0){
         if(execvp(comando->instruccion, comando->argumentos) == -1){
-            perror(ROJO "Error: problemas al ejecutar el comando en segundo plano" LETRA_NEGRITA);
+            perror(ROJO LETRA_NEGRITA "Error: problemas al ejecutar el comando en segundo plano" LETRA_NORMAL);
             exit(1);
         }
     } else {
@@ -94,7 +94,7 @@ int builtin_cd(Comando* comando_actual) {
 
     // Se respalda el directorio actual antes de realizar el cambio de ruta
     if (getcwd(ruta_actual_antes, sizeof(ruta_actual_antes)) == NULL) {
-        perror(ROJO"ucvsh: cd: getcwd"LETRA_NEGRITA);
+        perror(ROJO LETRA_NEGRITA"ucvsh: cd: getcwd"LETRA_NORMAL);
         return 1;
     }
 
@@ -102,7 +102,7 @@ int builtin_cd(Comando* comando_actual) {
     if (comando_actual->cant_argumentos == 0 || strcmp(comando_actual->argumentos[0], "~") == 0) {
         destino_final = getenv("HOME");
         if (destino_final == NULL) {
-            fprintf(stderr, ROJO "ucvsh: cd: No se pudo obtener la variable de entorno HOME\n"LETRA_NEGRITA);
+            fprintf(stderr, ROJO LETRA_NEGRITA "ucvsh: cd: No se pudo obtener la variable de entorno HOME\n"LETRA_NORMAL);
             return 1;
         }
     }
@@ -111,7 +111,7 @@ int builtin_cd(Comando* comando_actual) {
     else if (strcmp(comando_actual->argumentos[0], "-") == 0) {
         destino_final = getenv("OLDPWD");
         if (destino_final == NULL) {
-            fprintf(stderr, ROJO "ucvsh: cd: OLDPWD no se encuentra definido\n" LETRA_NEGRITA);
+            fprintf(stderr, ROJO LETRA_NEGRITA "ucvsh: cd: OLDPWD no se encuentra definido\n" LETRA_NORMAL);
             return 1;
         }
         //Se imprime la ruta a la que regresa cuando se usuario 
@@ -133,7 +133,7 @@ int builtin_cd(Comando* comando_actual) {
         return 0;
     } else {
         // Muestra un mensaje error si carpeta no está, simplemente o lo coloco mal o ya verá que hace 
-        perror(ROJO"ucvsh: cd"LETRA_NEGRITA);
+        perror(ROJO LETRA_NEGRITA"ucvsh: cd"LETRA_NORMAL);
         return 1;
     }
 }

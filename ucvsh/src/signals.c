@@ -42,10 +42,10 @@ void Manejadores_senales(){
     sa.sa_flags = SA_RESTART; 
 
     if (sigaction(SIGINT, &sa, NULL) == -1) {
-        perror(ROJO"Error al configurar SIGINT"LETRA_NEGRITA);
+        perror(ROJO LETRA_NEGRITA"Error al configurar SIGINT"LETRA_NORMAL);
     }
     if (sigaction(SIGTSTP, &sa, NULL) == -1) {
-        perror(ROJO"Error al configurar SIGTSTP"LETRA_NEGRITA);
+        perror(ROJO LETRA_NEGRITA"Error al configurar SIGTSTP"LETRA_NORMAL);
     }
 }
 //# {} [] > < || &&
